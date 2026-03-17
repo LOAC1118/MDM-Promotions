@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demande d'accès — Moulin des Moines</title>
+
+<style>
+/* ════════════════════════════════════════════════
+   MDM DESIGN SYSTEM — Beige Chaud 2026
+   Fraunces 200 + Inter 300/400/500
+   Palette : #f0ebe3 · #5c4a38 · #4a7c59 · #faf8f5
+════════════════════════════════════════════════ */
+:root{
+  --bg:#faf8f5;
+  --bg-card:#ffffff;
+  --bg-beige:#f0ebe3;
+  --bg-beige-dark:#e8dfd4;
+  --text:#5c4a38;
+  --text-secondary:#a89080;
+  --text-muted:#c0b0a0;
+  --accent:#4a7c59;
+  --accent-light:#eef4f0;
+  --accent-hover:#3d6b4a;
+  --border:#e8e0d6;
+  --border-light:#f0ebe8;
+  --danger:#c0392b;
+  --danger-light:#fdecea;
+  --warning:#b8860b;
+  --warning-light:#fef9ee;
+  --shadow:rgba(92,74,56,0.08);
+  /* Compat variables MDM existantes */
+  --brown:#5c4a38;
+  --terra:#8a6a5a;
+  --cream:#faf8f5;
+  --gold:#c8a87a;
+  --green:#4a7c59;
+  --red:#c0392b;
+  --white:#ffffff;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  font-size:13px;
+  line-height:1.6;
+  font-weight:300;
+  min-height:100vh;
+}
+
+/* ── HEADER UNIFIÉ ── */
+.mdm-header{
+  background:var(--bg-beige);
+  border-bottom:0.5px solid var(--border);
+  padding:0 28px;
+  height:56px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+}
+.mdm-logo{
+  font-family:'Fraunces',serif;
+  font-size:18px;font-weight:200;
+  color:var(--text);letter-spacing:-.2px;
+  text-decoration:none;
+}
+.mdm-logo span{color:var(--accent)}
+.mdm-logo small{
+  font-family:'Inter',sans-serif;font-size:10px;
+  font-weight:300;color:var(--text-muted);
+  margin-left:12px;vertical-align:middle;letter-spacing:.3px;
+}
+.mdm-header-actions{display:flex;align-items:center;gap:6px}
+.mdm-sep{width:0.5px;height:16px;background:var(--border);flex-shrink:0;margin:0 4px}
+
+/* ── BOUTONS ── */
+.mdm-btn{
+  padding:7px 14px;border-radius:6px;
+  font-family:'Inter',sans-serif;font-size:11px;font-weight:500;
+  cursor:pointer;border:0.5px solid var(--border);
+  background:var(--bg-card);color:var(--text);
+  transition:all .15s;white-space:nowrap;
+}
+.mdm-btn:hover{background:var(--bg-beige);border-color:var(--bg-beige-dark)}
+.mdm-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.mdm-btn.primary:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+.mdm-btn.beige{background:var(--bg-beige);color:var(--text);border-color:var(--border)}
+.mdm-btn.beige:hover{background:var(--bg-beige-dark)}
+.mdm-btn.danger{color:var(--danger);border-color:#f5c0b8}.mdm-btn.danger:hover{background:var(--danger-light)}
+.mdm-btn.ghost{background:transparent;color:var(--text-secondary);border-color:transparent}
+.mdm-btn.ghost:hover{background:var(--bg-beige);color:var(--text)}
+.mdm-btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* ── CHAT FAB ── */
+.mdm-chat-btn{
+  position:relative;padding:7px 10px;border-radius:6px;
+  font-size:14px;cursor:pointer;
+  border:0.5px solid var(--border);background:var(--bg-card);color:var(--text);
+  transition:all .15s;display:none;
+}
+.mdm-chat-btn:hover{background:var(--bg-beige)}
+.mdm-chat-badge{
+  position:absolute;top:-5px;right:-5px;
+  background:var(--danger);color:#fff;
+  font-size:9px;font-weight:600;padding:2px 5px;
+  border-radius:10px;min-width:16px;text-align:center;display:none;
+}
+
+/* ── CARTES ── */
+.mdm-card{
+  background:var(--bg-card);
+  border:0.5px solid var(--border);
+  border-radius:10px;
+  padding:20px 22px;
+}
+.mdm-card-title{
+  font-size:12px;font-weight:500;color:var(--text);
+  margin-bottom:14px;padding-bottom:12px;
+  border-bottom:0.5px solid var(--border-light);
+  display:flex;align-items:center;justify-content:space-between;
+}
+
+/* ── KPI CARDS ── */
+.mdm-kpi{
+  background:var(--bg-card);
+  border:0.5px solid var(--border);
+  border-radius:10px;padding:16px;
+}
+.mdm-kpi-label{
+  font-size:10px;font-weight:500;color:var(--text-muted);
+  text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;
+}
+.mdm-kpi-value{
+  font-family:'Fraunces',serif;font-size:28px;font-weight:200;
+  color:var(--text);line-height:1;
+}
+.mdm-kpi-value.accent{color:var(--accent)}
+.mdm-kpi-sub{font-size:11px;font-weight:300;color:var(--text-muted);margin-top:4px}
+
+/* ── TABLEAUX ── */
+.mdm-table-wrap{border:0.5px solid var(--border);border-radius:10px;overflow:hidden}
+table{width:100%;border-collapse:collapse}
+thead th{
+  padding:9px 14px;font-size:10px;font-weight:500;
+  color:var(--text-muted);background:var(--bg);
+  text-align:left;text-transform:uppercase;letter-spacing:.5px;
+  border-bottom:0.5px solid var(--border);white-space:nowrap;
+}
+tbody tr{border-bottom:0.5px solid var(--border-light);transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--bg)}
+tbody td{padding:10px 14px;font-size:12px;font-weight:300;color:var(--text)}
+
+/* ── BADGES ── */
+.mdm-badge{
+  display:inline-block;padding:2px 8px;border-radius:4px;
+  font-size:10px;font-weight:500;
+}
+.mdm-badge.client{background:var(--accent-light);color:var(--accent)}
+.mdm-badge.commercial{background:var(--bg-beige);color:var(--text-secondary)}
+.mdm-badge.admin{background:var(--warning-light);color:var(--warning)}
+.mdm-badge.danger{background:var(--danger-light);color:var(--danger)}
+.mdm-badge.remise{background:var(--warning-light);color:var(--warning)}
+
+/* ── FORMULAIRES ── */
+.mdm-fg{margin-bottom:14px}
+.mdm-fg label{
+  display:block;font-size:10px;font-weight:500;
+  color:var(--text-muted);text-transform:uppercase;
+  letter-spacing:.5px;margin-bottom:5px;
+}
+.mdm-fg input,.mdm-fg select,.mdm-fg textarea{
+  width:100%;padding:9px 12px;
+  border:0.5px solid var(--border);border-radius:6px;
+  font-family:'Inter',sans-serif;font-size:13px;font-weight:300;
+  color:var(--text);background:var(--bg-card);
+  outline:none;transition:border-color .15s,box-shadow .15s;appearance:none;
+}
+.mdm-fg input:focus,.mdm-fg select:focus,.mdm-fg textarea:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(74,124,89,.08);
+}
+.mdm-fg input::placeholder,.mdm-fg textarea::placeholder{color:var(--text-muted);font-weight:300}
+.mdm-fg textarea{resize:vertical;min-height:80px;line-height:1.6}
+.mdm-fg select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M5 6L0 0h10z' fill='%23a89080'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;
+  padding-right:32px;cursor:pointer;
+}
+.mdm-req{color:var(--accent)}
+
+/* ── SECTION LABEL ── */
+.mdm-section-label{
+  font-size:10px;font-weight:500;text-transform:uppercase;
+  letter-spacing:.8px;color:var(--accent);
+  margin-bottom:14px;display:flex;align-items:center;gap:8px;
+}
+.mdm-section-label::after{content:'';flex:1;height:0.5px;background:var(--border)}
+
+/* ── ALERTS ── */
+.mdm-alert{
+  padding:10px 14px;border-radius:6px;font-size:12px;
+  font-weight:300;border:0.5px solid;display:none;
+}
+.mdm-alert.err{background:var(--danger-light);color:var(--danger);border-color:#f5c0b8}
+.mdm-alert.ok{background:var(--accent-light);color:var(--accent);border-color:#b8d4c0}
+
+/* ── TOAST ── */
+.mdm-toast{
+  position:fixed;bottom:24px;right:24px;
+  background:var(--text);color:#fff;
+  padding:11px 18px;border-radius:8px;
+  font-size:12px;font-weight:400;
+  box-shadow:0 4px 20px var(--shadow);
+  transform:translateY(80px);opacity:0;
+  transition:all .3s;z-index:300;
+  display:flex;align-items:center;gap:8px;
+}
+.mdm-toast.show{transform:translateY(0);opacity:1}
+
+/* ── MODAL ── */
+.mdm-modal-bg{
+  display:none;position:fixed;inset:0;
+  background:rgba(92,74,56,.35);z-index:200;
+  align-items:center;justify-content:center;
+  backdrop-filter:blur(2px);
+}
+.mdm-modal-bg.open{display:flex}
+.mdm-modal{
+  background:var(--bg-card);border-radius:12px;
+  padding:28px 30px;max-width:600px;width:96%;
+  box-shadow:0 8px 40px var(--shadow);
+  max-height:92vh;overflow-y:auto;
+  border:0.5px solid var(--border);
+}
+.mdm-modal h3{
+  font-family:'Fraunces',serif;font-size:20px;font-weight:200;
+  color:var(--text);margin-bottom:20px;
+  padding-bottom:14px;border-bottom:0.5px solid var(--border);
+}
+
+/* ── PAGE TITLE ── */
+.mdm-page-title{
+  font-family:'Fraunces',serif;font-size:24px;font-weight:200;
+  color:var(--text);margin-bottom:4px;letter-spacing:-.3px;
+}
+.mdm-page-sub{font-size:12px;font-weight:300;color:var(--text-muted);margin-bottom:22px}
+
+/* ── SIDEBAR (admin) ── */
+.mdm-sidebar{
+  width:220px;background:var(--bg-card);
+  border-right:0.5px solid var(--border);
+  padding:16px 0;flex-shrink:0;
+  position:sticky;top:56px;
+  height:calc(100vh - 56px);overflow-y:auto;
+}
+.mdm-sidebar::-webkit-scrollbar{width:3px}
+.mdm-sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.mdm-sidebar-label{
+  font-size:9px;font-weight:500;color:var(--text-muted);
+  text-transform:uppercase;letter-spacing:.8px;
+  padding:10px 16px 5px;
+}
+.mdm-nav-item{
+  display:flex;align-items:center;gap:9px;
+  padding:8px 16px;cursor:pointer;
+  font-size:12px;font-weight:300;color:var(--text-secondary);
+  transition:all .13s;margin-bottom:1px;
+  border-left:2px solid transparent;
+}
+.mdm-nav-item:hover{background:var(--bg);color:var(--text)}
+.mdm-nav-item.active{
+  background:var(--bg);color:var(--text);
+  border-left-color:var(--accent);font-weight:500;
+}
+.mdm-nav-badge{
+  margin-left:auto;background:var(--accent);color:#fff;
+  font-size:9px;font-weight:600;padding:2px 6px;
+  border-radius:10px;min-width:16px;text-align:center;
+}
+
+/* ── FOOTER ── */
+.mdm-footer{
+  text-align:center;padding:20px;
+  font-size:11px;font-weight:300;color:var(--text-muted);
+  border-top:0.5px solid var(--border);
+}
+.mdm-footer a{color:inherit;text-decoration:none;opacity:.7}
+.mdm-footer a:hover{opacity:1}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .mdm-header{padding:0 16px}
+  .mdm-btn small{display:none}
+}
+
+body{background:var(--bg);min-height:100vh;display:grid;grid-template-rows:auto 1fr auto}
+.main-wrap{display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - 56px - 48px)}
+.panel-left{background:var(--bg-beige);padding:56px 48px;display:flex;flex-direction:column;justify-content:center;border-right:0.5px solid var(--border)}
+.panel-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent-light);color:var(--accent);font-size:10px;font-weight:500;padding:4px 12px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:24px;width:fit-content}
+.panel-title{font-family:'Fraunces',serif;font-size:36px;font-weight:200;color:var(--text);line-height:1.1;margin-bottom:14px;letter-spacing:-.4px}
+.panel-title em{color:var(--accent);font-style:italic}
+.panel-sub{font-size:13px;font-weight:300;color:var(--text-secondary);line-height:1.7;max-width:300px;margin-bottom:32px}
+.panel-steps{display:flex;flex-direction:column;gap:12px}
+.panel-step{display:flex;align-items:flex-start;gap:10px}
+.panel-step-num{width:22px;height:22px;border-radius:50%;background:var(--accent-light);color:var(--accent);font-size:11px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.panel-step-text{font-size:12px;font-weight:300;color:var(--text-secondary);line-height:1.5}
+.panel-step-text strong{color:var(--text);display:block;font-weight:500;margin-bottom:1px;font-size:12px}
+.panel-right{background:var(--bg);padding:40px 44px;overflow-y:auto;display:flex;flex-direction:column;justify-content:center}
+.form-alert{padding:10px 14px;border-radius:6px;font-size:12px;font-weight:300;margin-bottom:18px;display:none;border:0.5px solid}
+.form-alert.err{background:var(--danger-light);color:var(--danger);border-color:#f5c0b8}
+.form-section{margin-bottom:20px}
+.form-section-label{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.8px;color:var(--accent);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.form-section-label::after{content:'';flex:1;height:0.5px;background:var(--border)}
+.fg{margin-bottom:12px}.fg:last-child{margin-bottom:0}
+.fg label{display:block;font-size:10px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px}
+.fg .req{color:var(--accent)}
+.fg input,.fg select,.fg textarea{width:100%;padding:9px 12px;border:0.5px solid var(--border);border-radius:6px;font-family:'Inter',sans-serif;font-size:13px;font-weight:300;color:var(--text);background:var(--bg-card);transition:border-color .15s,box-shadow .15s;outline:none;appearance:none}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(74,124,89,.08)}
+.fg input::placeholder,.fg textarea::placeholder{color:var(--text-muted);font-weight:300}
+.fg textarea{resize:vertical;min-height:80px;line-height:1.5}
+.fg select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M5 6L0 0h10z' fill='%23a89080'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:30px;cursor:pointer}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row3{display:grid;grid-template-columns:2fr 1fr;gap:12px}
+.pwd-wrap{display:flex;gap:8px;align-items:stretch}
+.pwd-wrap input{flex:1}
+.pwd-toggle{padding:0 12px;background:var(--bg);border:0.5px solid var(--border);border-radius:6px;cursor:pointer;font-size:13px;color:var(--text-muted);display:flex;align-items:center;transition:background .15s}
+.pwd-toggle:hover{background:var(--bg-beige)}
+.pwd-strength{margin-top:4px;font-size:10px;display:flex;align-items:center;gap:7px}
+.strength-bar{flex:1;height:2px;background:var(--border);border-radius:2px;overflow:hidden}
+.strength-fill{height:100%;border-radius:2px;transition:width .3s,background .3s;width:0}
+.rgpd-box{background:var(--bg);border:0.5px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:16px}
+.rgpd-box label{display:flex;align-items:flex-start;gap:9px;font-size:12px;font-weight:300;color:var(--text-secondary);cursor:pointer;line-height:1.6}
+.rgpd-box input[type=checkbox]{width:auto;margin:0;margin-top:3px;flex-shrink:0;accent-color:var(--accent)}
+.rgpd-alert{display:none;margin-top:6px;font-size:11px;font-weight:300;color:var(--danger)}
+.btn-submit{width:100%;padding:11px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s;margin-bottom:10px}
+.btn-submit:hover{background:var(--accent-hover)}.btn-submit:disabled{opacity:.55;cursor:not-allowed}
+.form-note{font-size:11px;font-weight:300;color:var(--text-muted);text-align:center;line-height:1.5}
+.form-note a{color:inherit;text-decoration:none;opacity:.7}.form-note a:hover{opacity:1}
+.success-screen{display:none;text-align:center;padding:48px 32px;flex-direction:column;align-items:center}
+.success-screen.visible{display:flex}
+.success-icon{width:56px;height:56px;background:var(--accent-light);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+.success-title{font-family:'Fraunces',serif;font-size:26px;font-weight:200;color:var(--text);margin-bottom:8px}
+.success-sub{font-size:13px;font-weight:300;color:var(--text-secondary);line-height:1.6;max-width:300px;margin-bottom:6px}
+.success-count{font-size:12px;font-weight:300;color:var(--text-muted);margin-bottom:18px}
+.btn-login{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;padding:10px 24px;border-radius:6px;text-decoration:none;font-size:13px;font-weight:500;font-family:'Inter',sans-serif;transition:background .15s}
+.btn-login:hover{background:var(--accent-hover)}
+.mdm-footer{text-align:center;padding:16px 24px;font-size:11px;font-weight:300;color:var(--text-muted);border-top:0.5px solid var(--border);background:var(--bg)}
+.mdm-footer a{color:inherit;text-decoration:none;opacity:.7}.mdm-footer a:hover{opacity:1}
+/* Header */
+.site-header{background:var(--bg-beige);border-bottom:0.5px solid var(--border);padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:'Fraunces',serif;font-size:18px;font-weight:200;color:var(--text);text-decoration:none;letter-spacing:-.2px}
+.logo span{color:var(--accent)}
+.back-link{font-size:12px;font-weight:300;color:var(--text-muted);text-decoration:none;display:flex;align-items:center;gap:5px;transition:color .2s}
+.back-link:hover{color:var(--text)}
+@media(max-width:900px){.main-wrap{grid-template-columns:1fr}.panel-left{display:none}.panel-right{padding:28px 20px}}
+@media(max-width:480px){.row2,.row3{grid-template-columns:1fr}.site-header{padding:0 16px}}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,200;0,400;1,200&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<header class="site-header">
+  <a href="index.html" class="logo">Moulin <span>des</span> Moines</a>
+  <a href="index.html" class="back-link">&#8592; D&#233;j&#224; inscrit ? Se connecter</a>
+</header>
+
+<div class="main-wrap">
+
+  <!-- ── PANNEAU GAUCHE ── -->
+  <div class="panel-left">
+    <div class="panel-badge">&#127807; Espace partenaires 2026</div>
+    <div class="panel-title">Rejoignez<br>l&#8217;<em>espace</em><br>commande</div>
+    <p class="panel-sub">Acc&#233;dez au catalogue complet, passez vos commandes en ligne et g&#233;rez votre relation commerciale directement avec notre &#233;quipe.</p>
+    <div class="panel-steps">
+      <div class="panel-step">
+        <div class="panel-step-num">1</div>
+        <div class="panel-step-text"><strong>Remplissez le formulaire</strong>Vos informations magasin et identifiants souhait&#233;s</div>
+      </div>
+      <div class="panel-step">
+        <div class="panel-step-num">2</div>
+        <div class="panel-step-text"><strong>Compte cr&#233;&#233; instantan&#233;ment</strong>Connexion disponible imm&#233;diatement apr&#232;s validation</div>
+      </div>
+      <div class="panel-step">
+        <div class="panel-step-num">3</div>
+        <div class="panel-step-text"><strong>Acc&#232;s au catalogue complet</strong>1 390 r&#233;f&#233;rences bio avec vos prix et remises groupement</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PANNEAU DROIT ── -->
+  <div class="panel-right" id="panel-right">
+
+    <div class="form-alert" id="form-alert"></div>
+
+    <!-- Formulaire -->
+    <div id="form-wrap">
+
+      <!-- Magasin -->
+      <div class="form-section">
+        <div class="form-section-label">&#127978; Votre magasin</div>
+        <div class="fg">
+          <label>Nom du magasin <span class="req">*</span></label>
+          <input type="text" id="f-nom" placeholder="ex : Bio Village Strasbourg" autocomplete="organization">
+        </div>
+        <div class="row2">
+          <div class="fg">
+            <label>SIRET</label>
+            <input type="text" id="f-siret" placeholder="123 456 789 00012" maxlength="17">
+          </div>
+          <div class="fg">
+            <label>Groupement</label>
+            <select id="f-groupement">
+              <option value="">&#8212; Aucun &#8212;</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact -->
+      <div class="form-section">
+        <div class="form-section-label">&#128222; Contact</div>
+        <div class="row2">
+          <div class="fg">
+            <label>Email <span class="req">*</span></label>
+            <input type="email" id="f-email" placeholder="contact@magasin.fr" autocomplete="email">
+          </div>
+          <div class="fg">
+            <label>T&#233;l&#233;phone</label>
+            <input type="tel" id="f-tel" placeholder="06 12 34 56 78" autocomplete="tel">
+          </div>
+        </div>
+      </div>
+
+      <!-- Adresse -->
+      <div class="form-section">
+        <div class="form-section-label">&#128205; Adresse</div>
+        <div class="fg">
+          <label>Adresse</label>
+          <input type="text" id="f-adresse" placeholder="12 rue des Fleurs" autocomplete="street-address">
+        </div>
+        <div class="row3">
+          <div class="fg">
+            <label>Ville</label>
+            <input type="text" id="f-ville" placeholder="Strasbourg" autocomplete="address-level2">
+          </div>
+          <div class="fg">
+            <label>Code postal</label>
+            <input type="text" id="f-cp" placeholder="67000" maxlength="5" autocomplete="postal-code">
+          </div>
+        </div>
+      </div>
+
+      <!-- Identifiants -->
+      <div class="form-section">
+        <div class="form-section-label">&#128274; Identifiants</div>
+        <div class="row2">
+          <div class="fg">
+            <label>Login <span class="req">*</span></label>
+            <input type="text" id="f-login" placeholder="biovillage67" autocomplete="username"
+              oninput="this.value=this.value.toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_-]/g,'')">
+            <div style="font-size:10px;color:#b09080;margin-top:3px">Minuscules, sans espace</div>
+          </div>
+          <div class="fg">
+            <label>Mot de passe <span class="req">*</span></label>
+            <div class="pwd-wrap">
+              <input type="password" id="f-password" placeholder="Min. 8 caract&#232;res"
+                autocomplete="new-password" oninput="checkStrength(this.value)">
+              <button type="button" class="pwd-toggle" onclick="togglePwd()" id="pwd-btn">&#128065;</button>
+            </div>
+            <div class="pwd-strength">
+              <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+              <span id="strength-label" style="min-width:52px;text-align:right;font-size:10px"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Message -->
+      <div class="form-section">
+        <div class="form-section-label">&#128172; Message</div>
+        <div class="fg">
+          <textarea id="f-message" placeholder="Commercial r&#233;f&#233;rent, questions, demandes particuli&#232;res&#8230;"></textarea>
+        </div>
+      </div>
+
+      <!-- RGPD -->
+      <div class="rgpd-box">
+        <label>
+          <input type="checkbox" id="f-rgpd">
+          J&#8217;accepte que Moulin des Moines collecte mes donn&#233;es dans le cadre de notre relation commerciale, conform&#233;ment au <a href="mentions-legales.html" target="_blank" style="color:var(--terra);font-weight:600">RGPD</a>. Ces donn&#233;es ne seront pas c&#233;d&#233;es &#224; des tiers.
+        </label>
+        <div class="rgpd-alert" id="rgpd-alert">&#9888; Veuillez accepter les conditions pour continuer.</div>
+      </div>
+
+      <!-- Submit -->
+      <button class="btn-submit" onclick="submitForm()" id="btn-submit">
+        <span id="btn-label">Cr&#233;er mon compte</span>
+      </button>
+      <p class="form-note">Vos donn&#233;es sont prot&#233;g&#233;es et chiffr&#233;es &nbsp;&middot;&nbsp; <a href="mentions-legales.html" style="color:inherit">Mentions l&#233;gales</a></p>
+
+    </div>
+
+    <!-- Écran succès -->
+    <div class="success-screen" id="success-screen">
+      <div class="success-icon">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <path d="M7 16l7 7 11-13" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="success-title">Compte cr&#233;&#233; !</div>
+      <p class="success-sub">Votre compte est actif. Connectez-vous d&#232;s maintenant avec votre login et mot de passe.</p>
+      <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px 14px;margin:12px 0;font-size:12px;color:#9a3412;text-align:left;line-height:1.6">
+        <strong>&#9993; Email de confirmation &#224; venir</strong><br>
+        Vous allez recevoir un email de <strong>FormSubmit</strong> vous demandant de confirmer votre adresse. Cliquez sur le bouton <em>&#171;&#160;Confirm submission&#160;&#187;</em> dans cet email pour activer la r&#233;ception de vos acc&#232;s.
+      </div>
+      <p class="success-count">Redirection automatique dans <strong id="redirect-count">4</strong>&#160;secondes&#8230;</p>
+      <a href="index.html" class="btn-login">&#128274; Se connecter maintenant</a>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  &copy; 2026 Moulin des Moines &nbsp;&middot;&nbsp;
+  <a href="mentions-legales.html">Mentions l&#233;gales &amp; RGPD</a> &nbsp;&middot;&nbsp;
+  <a href="tutoriel.html">Guide d&#8217;utilisation</a>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+
+(function(){
+  var sel=document.getElementById('f-groupement');
+  var gl=[];
+  try{gl=JSON.parse(localStorage.getItem('mdm_groupements')||'[]');}catch(e){}
+  var defaults=['Biocoop','Naturalia','Bio c\u2019Bon','La Vie Claire','Biomonde','Cabernet'];
+  var list=gl.length?gl.map(function(g){return g.nom;}):defaults;
+  list.forEach(function(nom){
+    var o=document.createElement('option');
+    o.value=nom;o.textContent=nom;sel.appendChild(o);
+  });
+})();
+
+function togglePwd(){
+  var inp=document.getElementById('f-password');
+  var btn=document.getElementById('pwd-btn');
+  inp.type=inp.type==='password'?'text':'password';
+  btn.innerHTML=inp.type==='password'?'&#128065; Voir':'&#128683; Masquer';
+}
+
+function checkStrength(pwd){
+  var fill=document.getElementById('strength-fill');
+  var lbl=document.getElementById('strength-label');
+  var s=0;
+  if(pwd.length>=8)s++;
+  if(pwd.length>=12)s++;
+  if(/[A-Z]/.test(pwd))s++;
+  if(/[0-9]/.test(pwd))s++;
+  if(/[^A-Za-z0-9]/.test(pwd))s++;
+  var levels=[
+    {p:'0%',c:'#eee',t:''},
+    {p:'20%',c:'#e53935',t:'Faible'},
+    {p:'45%',c:'#fb8c00',t:'Moyen'},
+    {p:'65%',c:'#fdd835',t:'Bien'},
+    {p:'85%',c:'#43a047',t:'Fort'},
+    {p:'100%',c:'#1a5c2e',t:'Excellent'}
+  ];
+  var l=levels[Math.min(s,5)];
+  fill.style.width=l.p;fill.style.background=l.c;
+  lbl.textContent=l.t;lbl.style.color=l.c;
+}
+
+function showAlert(msg,type){
+  var al=document.getElementById('form-alert');
+  al.textContent=msg;al.className='alert '+type;al.style.display='block';
+  al.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+
+// ── SHA-256 (Web Crypto API) ──────────────────────────────────
+// SHA-256 robuste (crypto.subtle + fallback pure JS)
+function sha256(str){
+  if(window.crypto&&window.crypto.subtle){
+    return window.crypto.subtle.digest('SHA-256',new TextEncoder().encode(str))
+      .then(function(buf){return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');});
+  }
+  return Promise.resolve(_sha256Pure(str));
+}
+function _sha256Pure(s){
+  function n(x){return('00000000'+x.toString(16)).slice(-8)}
+  var K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  var H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  function rr(x,n){return(x>>>n)|(x<<(32-n));}
+  var b=[],i,j;
+  for(i=0;i<s.length;i++){var c=s.charCodeAt(i);if(c<128)b.push(c);else if(c<2048)b.push((c>>6)|192,(c&63)|128);else b.push((c>>12)|224,((c>>6)&63)|128,(c&63)|128);}
+  var len=b.length;b.push(128);while(b.length%64!==56)b.push(0);
+  var bits=len*8;b.push(0,0,0,0,(bits>>>24)&255,(bits>>>16)&255,(bits>>>8)&255,bits&255);
+  for(i=0;i<b.length;i+=64){
+    var w=[];for(j=0;j<16;j++)w.push((b[i+j*4]<<24)|(b[i+j*4+1]<<16)|(b[i+j*4+2]<<8)|b[i+j*4+3]);
+    for(j=16;j<64;j++){var s0=rr(w[j-15],7)^rr(w[j-15],18)^(w[j-15]>>>3);var s1=rr(w[j-2],17)^rr(w[j-2],19)^(w[j-2]>>>10);w.push((w[j-16]+s0+w[j-7]+s1)>>>0);}
+    var aa=H[0],bb=H[1],cc=H[2],dd=H[3],ee=H[4],ff=H[5],gg=H[6],hh=H[7];
+    for(j=0;j<64;j++){var S1=rr(ee,6)^rr(ee,11)^rr(ee,25);var ch=(ee&ff)^(~ee&gg);var t1=(hh+S1+ch+K[j]+w[j])>>>0;var S0=rr(aa,2)^rr(aa,13)^rr(aa,22);var maj=(aa&bb)^(aa&cc)^(bb&cc);var t2=(S0+maj)>>>0;hh=gg;gg=ff;ff=ee;ee=(dd+t1)>>>0;dd=cc;cc=bb;bb=aa;aa=(t1+t2)>>>0;}
+    H[0]=(H[0]+aa)>>>0;H[1]=(H[1]+bb)>>>0;H[2]=(H[2]+cc)>>>0;H[3]=(H[3]+dd)>>>0;H[4]=(H[4]+ee)>>>0;H[5]=(H[5]+ff)>>>0;H[6]=(H[6]+gg)>>>0;H[7]=(H[7]+hh)>>>0;
+  }
+  return H.map(n).join('');
+}
+
+
+// ── Config Firebase ──────────────────────────────────────────
+var _fbApp=null,_fbDb=null;
+function initFB(){
+  if(_fbDb) return Promise.resolve(_fbDb);
+  if(typeof firebase==="undefined") return Promise.reject(new Error("SDK Firebase non charg\u00e9. V\u00e9rifiez votre connexion internet."));
+  if(!_fbApp) _fbApp=firebase.initializeApp({
+    apiKey:"AIzaSyB000QDa4c-vMjO1Xuimw58iiRvwgbF1zc",
+    authDomain:"mdm-bdc26.firebaseapp.com",
+    projectId:"mdm-bdc26",
+    storageBucket:"mdm-bdc26.firebasestorage.app",
+    messagingSenderId:"52658530893",
+    appId:"1:52658530893:web:166626ae4d681465ddca04"
+  });
+  _fbDb=firebase.firestore(_fbApp);
+  return Promise.resolve(_fbDb);
+}
+
+function submitForm(){
+  var nom     = document.getElementById('f-nom').value.trim();
+  var email   = document.getElementById('f-email').value.trim();
+  var login   = document.getElementById('f-login').value.trim();
+  var password= document.getElementById('f-password').value.trim();
+  var siret   = document.getElementById('f-siret').value.trim();
+  var grp     = document.getElementById('f-groupement').value;
+  var tel     = document.getElementById('f-tel').value.trim();
+  var adresse = document.getElementById('f-adresse').value.trim();
+  var ville   = document.getElementById('f-ville').value.trim();
+  var cp      = document.getElementById('f-cp').value.trim();
+  var msg     = document.getElementById('f-message').value.trim();
+
+  // Validation consentement RGPD
+  var rgpdCb = document.getElementById('f-rgpd');
+  if(!rgpdCb || !rgpdCb.checked){
+    var ra = document.getElementById('rgpd-alert');
+    if(ra) ra.style.display = 'block';
+    if(rgpdCb) rgpdCb.scrollIntoView({behavior:'smooth', block:'center'});
+    return;
+  }
+
+  // Validation champs
+  if(!nom){ showAlert('Le nom du magasin est obligatoire.', 'err'); return; }
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showAlert("L\u2019email n\u2019est pas valide.", 'err'); return; }
+  if(!login || login.length < 3){ showAlert('Le login doit faire au moins 3 caract\u00e8res.', 'err'); return; }
+  if(!password || password.length < 8){ showAlert('Le mot de passe doit faire au moins 8 caract\u00e8res.', 'err'); return; }
+
+  var btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+  btn.innerHTML = '&#8987; Cr\u00e9ation\u2026';
+
+  function onError(msg){
+    showAlert(msg || 'Erreur. V\u00e9rifiez votre connexion.', 'err');
+    btn.disabled = false;
+    btn.innerHTML = '<span>&#10003;</span> Envoyer la demande';
+  }
+
+  // Étape 1 : hacher le mot de passe
+  sha256(password).then(function(hashedPwd){
+
+    // Étape 2 : vérifier que le login n'existe pas déjà
+    initFB().then(function(db){
+      return db.collection('comptes').doc(login).get();
+    }).then(function(doc){
+      if(doc.exists){
+        showAlert('Ce login est d\u00e9j\u00e0 utilis\u00e9. Choisissez-en un autre.', 'err');
+        btn.disabled = false;
+        btn.innerHTML = '<span>&#10003;</span> Envoyer la demande';
+        return;
+      }
+
+      // Étape 3 : récupérer les infos du groupement
+      var grpPromise;
+      if(!grp){
+        grpPromise = Promise.resolve({remise:0, franco:0, grpRemises:[]});
+      } else {
+        grpPromise = initFB().then(function(db){
+          return db.collection('groupements').get();
+        }).then(function(snap){
+          var g = snap.docs.map(function(d){ return d.data(); })
+                          .find(function(x){ return x.nom === grp; });
+          if(g) return {remise:parseFloat(g.remise)||0, franco:parseFloat(g.franco)||0, grpRemises:g.remises_produits||[]};
+          return {remise:0, franco:0, grpRemises:[]};
+        });
+      }
+
+      grpPromise.then(function(gd){
+
+        // Étape 4 : créer le compte dans Firebase
+        var nc = {
+          login:login, password:hashedPwd, nom:nom, role:'client',
+          remise:gd.remise, email:email, tel:tel,
+          ville:ville, cp:cp, siret:siret,
+          groupement:grp, franco:gd.franco,
+          grp_remises:gd.grpRemises,
+          remises_produits:[], commercial:'', numclient:'',
+          dateInscription: new Date().toISOString()
+        };
+
+        initFB().then(function(db){
+          return db.collection('comptes').doc(login).set(nc);
+        }).then(function(){
+
+          // Étape 5 : notifier l'admin (non-bloquant)
+          var fd = new FormData();
+          fd.append('_subject', 'Nouveau compte MDM \u2014 ' + nom);
+          fd.append('_captcha', 'false');
+          fd.append('_template', 'box');
+          fd.append('Login', login);
+          fd.append('Magasin', nom);
+          fd.append('Email', email);
+          if(grp)   fd.append('Groupement', grp);
+          if(tel)   fd.append('Tel', tel);
+          if(ville) fd.append('Ville', ville + ' ' + cp);
+          if(msg)   fd.append('Message', msg);
+          fetch('https://formsubmit.co/cspoto@moulindesmoines.com', {method:'POST', body:fd}).catch(function(){});
+
+          // ── Email récapitulatif au client ──────────────────────
+          var fdC = new FormData();
+          fdC.append('_subject', 'Vos accès Bon de Commande — Moulin des Moines');
+          fdC.append('_captcha', 'false');
+          fdC.append('_template', 'box');
+          fdC.append('_replyto', 'cspoto@moulindesmoines.com');
+          fdC.append('Bonjour', nom);
+          fdC.append('Login', login);
+          fdC.append('Lien', 'https://loac1118.github.io/MDM-BDC26/index.html');
+          if(grp) fdC.append('Groupement', grp);
+          fdC.append('message',
+            'Bonjour ' + nom + ',\n\n'
+            + 'Votre compte Bon de Commande Moulin des Moines a été créé.\n\n'
+            + 'Vos identifiants :\n'
+            + '  Login : ' + login + '\n'
+            + '  Mot de passe : celui choisi lors de l\'inscription\n\n'
+            + 'Connexion : https://loac1118.github.io/MDM-BDC26/index.html\n'
+            + (grp ? 'Groupement : ' + grp + '\n' : '')
+            + '\nCordialement,\nL\'\u00e9quipe Moulin des Moines'
+          );
+          fetch('https://formsubmit.co/' + encodeURIComponent(email), {method:'POST', body:fdC}).catch(function(){});
+
+          // Étape 6 : afficher le succès + redirection
+          var _fw=document.getElementById('form-wrap');if(_fw)_fw.style.display='none';
+          var _ss=document.getElementById('success-screen');if(_ss)_ss.style.display='block';
+          // hero-sub supprimé dans le nouveau design
+          var count = 4;
+          var el = document.getElementById('redirect-count');
+          if(el) el.textContent = count;
+          var t = setInterval(function(){
+            count--;
+            if(el) el.textContent = count;
+            if(count <= 0){ clearInterval(t); window.location.href = 'index.html'; }
+          }, 1000);
+
+        }).catch(function(e){
+          onError('Erreur lors de la cr\u00e9ation du compte\u00a0: ' + (e.message || e));
+        });
+
+      }).catch(function(e){
+        onError('Erreur lors de la r\u00e9cup\u00e9ration du groupement\u00a0: ' + (e.message || e));
+      });
+
+    }).catch(function(e){
+      onError('Erreur de connexion Firebase\u00a0: ' + (e.message || e));
+    });
+
+  }).catch(function(e){
+    onError('Erreur technique (hachage)\u00a0: ' + (e.message || e));
+  });
+}
+
+document.addEventListener('keydown',function(e){
+  if(e.key==='Enter'&&e.target.tagName!=='TEXTAREA')submitForm();
+});
+
+</script>
+</body>
+</html>
