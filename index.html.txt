@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOAC Dev | Solutions Web & Digitales</title>
+    <style>
+        :root {
+            --dark-blue: #0a2540;
+            --light-blue: #7fa1c3;
+            --white: #ffffff;
+            --bg-gray: #f4f7f9;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            line-height: 1.6;
+            color: var(--dark-blue);
+            background-color: var(--bg-gray);
+        }
+
+        header {
+            background: var(--white);
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            max-width: 200px;
+            height: auto;
+        }
+
+        nav {
+            margin-top: 1rem;
+        }
+
+        nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: var(--dark-blue);
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .hero {
+            padding: 100px 20px;
+            text-align: center;
+            background: linear-gradient(135deg, var(--dark-blue) 0%, #1a3a5a 100%);
+            color: var(--white);
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .services {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            padding: 50px 10%;
+        }
+
+        .service-card {
+            background: var(--white);
+            border-radius: 8px;
+            padding: 30px;
+            margin: 20px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .service-card h3 {
+            color: var(--light-blue);
+        }
+
+        footer {
+            background: var(--dark-blue);
+            color: var(--white);
+            text-align: center;
+            padding: 40px 0;
+            margin-top: 50px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: var(--light-blue);
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 25px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="logo loac dev.jpg" alt="LOAC Dev Logo" class="logo">
+        <nav>
+            <a href="#accueil">Accueil</a>
+            <a href="#services">Services</a>
+            <a href="#contact">Contact</a>
+        </nav>
+    </header>
+
+    <section class="hero" id="accueil">
+        <h1>Innover par le code</h1>
+        <p>Expertise en développement web, solutions SaaS et architecture logicielle.</p>
+        <a href="#contact" class="cta-button">Discutons de votre projet</a>
+    </section>
+
+    <section class="services" id="services">
+        <div class="service-card">
+            <h3>Développement Web</h3>
+            <p>Conception de sites vitrines et applications web sur mesure avec les technologies les plus modernes.</p>
+        </div>
+        <div class="service-card">
+            <h3>Solutions SaaS</h3>
+            <p>Architecture et mise en place de plateformes logicielles évolutives et performantes.</p>
+        </div>
+        <div class="service-card">
+            <h3>Conseil IT</h3>
+            <p>Accompagnement stratégique pour la transformation digitale de votre entreprise.</p>
+        </div>
+    </section>
+
+    <footer id="contact">
+        <h2>LOAC Dev</h2>
+        <p>Contactez-nous à : contact@loacdev.fr</p>
+        <p>&copy; 2026 LOAC Dev. Tous droits réservés.</p>
+    </footer>
+
+</body>
+</html>
