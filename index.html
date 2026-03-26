@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bienvenue — CRM Commandes</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --c-bg:       #f4efe6;
+  --c-paper:    #faf7f2;
+  --c-dark:     #1c1a16;
+  --c-green:    #2d5a27;
+  --c-green-m:  #3d7535;
+  --c-green-l:  #e6efe4;
+  --c-accent:   #b8924a;
+  --c-accent-l: #f5ead8;
+  --c-muted:    #7a7268;
+  --c-border:   #ddd6c8;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans:  'Outfit', sans-serif;
+  --font-mono:  'DM Mono', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-sans);
+  background: var(--c-bg);
+  color: var(--c-dark);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── GRAIN TEXTURE ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: .4;
+}
+
+/* ── HERO ── */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem 2rem;
+  overflow: hidden;
+}
+
+/* Background circles décoratifs */
+.hero::after {
+  content: '';
+  position: absolute;
+  width: 700px;
+  height: 700px;
+  border-radius: 50%;
+  border: 1px solid rgba(45,90,39,.08);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation: breathe 8s ease-in-out infinite;
+}
+@keyframes breathe {
+  0%, 100% { transform: translate(-50%,-50%) scale(1); opacity: .5; }
+  50%       { transform: translate(-50%,-50%) scale(1.04); opacity: .9; }
+}
+
+.deco-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(45,90,39,.05);
+  pointer-events: none;
+}
+.deco-ring.r1 { width: 900px; height: 900px; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+.deco-ring.r2 { width: 500px; height: 500px; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+
+/* Blobs de couleur */
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: .18;
+  pointer-events: none;
+}
+.blob.b1 { width: 400px; height: 400px; background: var(--c-green); top: -10%; right: -8%; }
+.blob.b2 { width: 300px; height: 300px; background: var(--c-accent); bottom: 5%; left: -5%; }
+
+/* ── BADGE ── */
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 1rem;
+  border: 1px solid var(--c-border);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+  background: rgba(255,255,255,.6);
+  backdrop-filter: blur(8px);
+  margin-bottom: 2rem;
+  opacity: 0;
+  animation: fadeUp .6s .1s forwards;
+}
+.hero-badge .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--c-green);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: .5; transform: scale(.7); }
+}
+
+/* ── LOGO / NOM ── */
+.hero-logo {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  background: var(--c-green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 12px 40px rgba(45,90,39,.25), 0 2px 8px rgba(0,0,0,.1);
+  opacity: 0;
+  animation: fadeUp .6s .2s forwards;
+  overflow: hidden;
+}
+.hero-logo img { width: 100%; height: 100%; object-fit: contain; }
+
+.hero-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2.6rem, 6vw, 4.2rem);
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.05;
+  color: var(--c-dark);
+  margin-bottom: .6rem;
+  opacity: 0;
+  animation: fadeUp .6s .3s forwards;
+}
+.hero-title em {
+  font-style: italic;
+  color: var(--c-green);
+}
+
+.hero-subtitle {
+  font-size: 1rem;
+  color: var(--c-muted);
+  text-align: center;
+  font-weight: 300;
+  margin-bottom: 3rem;
+  max-width: 480px;
+  line-height: 1.6;
+  opacity: 0;
+  animation: fadeUp .6s .4s forwards;
+}
+
+/* ── CARDS PORTAIL ── */
+.portal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  width: 100%;
+  max-width: 680px;
+  opacity: 0;
+  animation: fadeUp .7s .5s forwards;
+}
+
+.portal-card {
+  position: relative;
+  border-radius: 20px;
+  padding: 2rem 1.75rem;
+  text-decoration: none;
+  color: inherit;
+  overflow: hidden;
+  transition: transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .25s;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.portal-card:hover {
+  transform: translateY(-5px) scale(1.01);
+}
+
+/* Revendeur card */
+.portal-card.revendeur {
+  background: var(--c-green);
+  color: white;
+  box-shadow: 0 8px 40px rgba(45,90,39,.3), 0 2px 8px rgba(0,0,0,.1);
+}
+.portal-card.revendeur:hover {
+  box-shadow: 0 16px 56px rgba(45,90,39,.38), 0 4px 12px rgba(0,0,0,.12);
+}
+
+/* Admin card */
+.portal-card.admin {
+  background: var(--c-paper);
+  color: var(--c-dark);
+  border: 1px solid var(--c-border);
+  box-shadow: 0 4px 24px rgba(0,0,0,.07);
+}
+.portal-card.admin:hover {
+  box-shadow: 0 12px 40px rgba(0,0,0,.12);
+}
+
+/* Deco shape inside cards */
+.portal-card::before {
+  content: '';
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  right: -50px;
+  bottom: -60px;
+  pointer-events: none;
+  transition: transform .3s;
+}
+.portal-card:hover::before { transform: scale(1.15); }
+.portal-card.revendeur::before { background: rgba(255,255,255,.07); }
+.portal-card.admin::before { background: var(--c-green-l); }
+
+.card-tag {
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  margin-bottom: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.portal-card.revendeur .card-tag { opacity: .75; }
+.portal-card.admin .card-tag { color: var(--c-muted); }
+
+.card-icon {
+  font-size: 2.4rem;
+  margin-bottom: .9rem;
+  display: block;
+  line-height: 1;
+}
+
+.card-title {
+  font-family: var(--font-serif);
+  font-size: 1.7rem;
+  font-weight: 600;
+  line-height: 1.1;
+  margin-bottom: .55rem;
+}
+
+.card-desc {
+  font-size: .84rem;
+  line-height: 1.55;
+  font-weight: 300;
+  flex: 1;
+  margin-bottom: 1.4rem;
+}
+.portal-card.revendeur .card-desc { opacity: .85; }
+.portal-card.admin .card-desc { color: var(--c-muted); }
+
+.card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  font-size: .82rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  padding: .55rem 1.15rem;
+  border-radius: 999px;
+  transition: all .2s;
+  width: fit-content;
+}
+.portal-card.revendeur .card-cta {
+  background: rgba(255,255,255,.18);
+  color: white;
+  border: 1px solid rgba(255,255,255,.3);
+}
+.portal-card.revendeur:hover .card-cta {
+  background: rgba(255,255,255,.28);
+}
+.portal-card.admin .card-cta {
+  background: var(--c-green);
+  color: white;
+  border: 1px solid transparent;
+  box-shadow: 0 2px 12px rgba(45,90,39,.25);
+}
+.portal-card.admin:hover .card-cta {
+  background: #234820;
+}
+
+.cta-arrow {
+  transition: transform .2s;
+}
+.portal-card:hover .cta-arrow { transform: translateX(3px); }
+
+/* ── FEATURES ── */
+.features {
+  width: 100%;
+  max-width: 680px;
+  margin-top: 3.5rem;
+  opacity: 0;
+  animation: fadeUp .6s .7s forwards;
+  display: flex;
+  justify-content: center;
+  gap: 2.5rem;
+  flex-wrap: wrap;
+}
+.feature {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  font-size: .78rem;
+  color: var(--c-muted);
+  font-weight: 400;
+}
+.feature .feat-icon {
+  font-size: 1rem;
+}
+
+/* ── FOOTER ── */
+.footer {
+  padding: 1.5rem;
+  text-align: center;
+  font-size: .72rem;
+  color: var(--c-muted);
+  opacity: 0;
+  animation: fadeUp .5s .9s forwards;
+  position: relative;
+  z-index: 1;
+}
+.footer a { color: var(--c-muted); text-decoration: underline; text-underline-offset: 3px; }
+.footer .sep { margin: 0 .6rem; opacity: .4; }
+
+/* ── STATUS BADGE ── */
+.status-strip {
+  width: 100%;
+  max-width: 680px;
+  margin-top: 1.5rem;
+  background: rgba(255,255,255,.55);
+  border: 1px solid var(--c-border);
+  border-radius: 12px;
+  padding: .75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  animation: fadeUp .6s .6s forwards;
+  flex-wrap: wrap;
+}
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  font-size: .75rem;
+  color: var(--c-muted);
+}
+.status-item strong {
+  color: var(--c-dark);
+  font-weight: 600;
+}
+.status-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #4caf50;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 2px rgba(76,175,80,.2);
+}
+.status-val {
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  padding: 1px 7px;
+  background: var(--c-green-l);
+  color: var(--c-green);
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 560px) {
+  .portal-grid { grid-template-columns: 1fr; max-width: 360px; }
+  .hero-title { font-size: 2.2rem; }
+  .features { gap: 1.2rem; }
+  .status-strip { justify-content: center; }
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <!-- Décorations -->
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="deco-ring r1"></div>
+  <div class="deco-ring r2"></div>
+
+  <!-- Badge statut -->
+  <div class="hero-badge">
+    <span class="dot"></span>
+    Plateforme de commandes en ligne
+  </div>
+
+  <!-- Logo dynamique -->
+  <div class="hero-logo" id="hero-logo">
+    <span id="logo-fallback">🌿</span>
+  </div>
+
+  <!-- Titre -->
+  <h1 class="hero-title" id="hero-title">
+    Bienvenue chez<br><em id="nom-societe">votre producteur</em>
+  </h1>
+  <p class="hero-subtitle" id="hero-subtitle">
+    Passez vos commandes en ligne, consultez notre catalogue et gérez votre relation commerciale simplement.
+  </p>
+
+  <!-- Portail -->
+  <div class="portal-grid">
+
+    <a class="portal-card revendeur" href="commande.html">
+      <div class="card-tag">
+        <span>🛒</span> Revendeur
+      </div>
+      <span class="card-icon">📋</span>
+      <div class="card-title">Passer une commande</div>
+      <p class="card-desc">Accédez au catalogue, sélectionnez vos produits et envoyez votre bon de commande directement.</p>
+      <div class="card-cta">
+        Accéder au bon de commande
+        <span class="cta-arrow">→</span>
+      </div>
+    </a>
+
+    <a class="portal-card admin" href="admin.html">
+      <div class="card-tag">
+        <span>⚙️</span> Administration
+      </div>
+      <span class="card-icon">🗂️</span>
+      <div class="card-title">Espace administration</div>
+      <p class="card-desc">Configurez le catalogue, les tarifs, les remises et la charte graphique de la plateforme.</p>
+      <div class="card-cta">
+        Ouvrir l'administration
+        <span class="cta-arrow">→</span>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- Bande statut config -->
+  <div class="status-strip" id="status-strip">
+    <div class="status-item">
+      <span class="status-dot"></span>
+      <span>Collection active : <strong id="status-collection">—</strong></span>
+    </div>
+    <div class="status-item">
+      <span id="status-produits" class="status-val">—</span>
+      <span>produits</span>
+    </div>
+    <div class="status-item">
+      <span id="status-remises" class="status-val">—</span>
+      <span>profils remise</span>
+    </div>
+    <div class="status-item" id="status-limite-wrap" style="display:none">
+      📅 Commandes avant le <strong id="status-limite">—</strong>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <div class="features">
+    <div class="feature"><span class="feat-icon">📥</span> Import CSV & JSON</div>
+    <div class="feature"><span class="feat-icon">🏷️</span> Remises personnalisées</div>
+    <div class="feature"><span class="feat-icon">📨</span> Envoi par email</div>
+    <div class="feature"><span class="feat-icon">🎨</span> Charte adaptable</div>
+    <div class="feature"><span class="feat-icon">📱</span> Compatible mobile</div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <span id="footer-societe">CRM Commandes</span>
+  <span class="sep">·</span>
+  <a href="commande.html">Bon de commande</a>
+  <span class="sep">·</span>
+  <a href="admin.html">Administration</a>
+  <span class="sep">·</span>
+  <a href="README.md">Documentation</a>
+</footer>
+
+<script>
+// Charge la config depuis localStorage ou config.json et personnalise la page
+const CONFIG_KEY = 'crm_config';
+
+function applyConfig(cfg) {
+  if (!cfg) return;
+  const s = cfg.societe || {};
+  const c = cfg.collection || {};
+  const ch = cfg.charte || {};
+
+  // Nom société
+  const nom = s.nom || 'votre producteur';
+  document.getElementById('nom-societe').textContent = nom;
+  document.getElementById('footer-societe').textContent = nom;
+  document.title = 'Bienvenue — ' + nom;
+
+  // Logo
+  if (s.logo_url) {
+    const img = document.createElement('img');
+    img.src = s.logo_url;
+    img.alt = nom;
+    img.onerror = () => {};
+    document.getElementById('logo-fallback').style.display = 'none';
+    document.getElementById('hero-logo').appendChild(img);
+  }
+
+  // Slogan
+  if (s.slogan) {
+    document.getElementById('hero-subtitle').textContent = s.slogan;
+  }
+
+  // Collection
+  if (c.nom) {
+    document.getElementById('status-collection').textContent = c.nom;
+  }
+  if (c.date_limite_commande) {
+    document.getElementById('status-limite').textContent = c.date_limite_commande;
+    document.getElementById('status-limite-wrap').style.display = 'flex';
+  }
+
+  // Stats
+  const nb = (cfg.catalogue || []).length;
+  document.getElementById('status-produits').textContent = nb;
+  document.getElementById('status-remises').textContent = (cfg.remises || []).length;
+
+  // Couleurs
+  if (ch.couleur_principale) {
+    document.documentElement.style.setProperty('--c-green', ch.couleur_principale);
+  }
+  if (ch.couleur_secondaire) {
+    document.documentElement.style.setProperty('--c-bg', ch.couleur_secondaire);
+  }
+  if (ch.couleur_accent) {
+    document.documentElement.style.setProperty('--c-accent', ch.couleur_accent);
+  }
+}
+
+// 1. Depuis localStorage
+try {
+  const raw = localStorage.getItem(CONFIG_KEY);
+  if (raw) { applyConfig(JSON.parse(raw)); }
+} catch(e) {}
+
+// 2. Depuis config.json (peut enrichir)
+fetch('config.json?t=' + Date.now())
+  .then(r => r.ok ? r.json() : null)
+  .then(data => { if (data) applyConfig(data); })
+  .catch(() => {});
+</script>
+</body>
+</html>
