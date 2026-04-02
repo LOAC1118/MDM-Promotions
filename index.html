@@ -1,581 +1,266 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bienvenue — CRM Commandes</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-:root {
-  --c-bg:       #f4efe6;
-  --c-paper:    #faf7f2;
-  --c-dark:     #1c1a16;
-  --c-green:    #2d5a27;
-  --c-green-m:  #3d7535;
-  --c-green-l:  #e6efe4;
-  --c-accent:   #b8924a;
-  --c-accent-l: #f5ead8;
-  --c-muted:    #7a7268;
-  --c-border:   #ddd6c8;
-  --font-serif: 'Cormorant Garamond', Georgia, serif;
-  --font-sans:  'Outfit', sans-serif;
-  --font-mono:  'DM Mono', monospace;
-}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LOAC DEV Solutions — Connexion</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:  #1E2D4E;
+      --teal:  #3EC6C6;
+      --blue:  #2E5FA3;
+      --light: #F4F8FF;
+      --gray:  #6B7A99;
+      --white: #FFFFFF;
+    }
+    body { font-family: 'Outfit', sans-serif; min-height: 100vh; display: flex; overflow: hidden; background: var(--light); }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 16px; scroll-behavior: smooth; }
+    .panel-left {
+      flex: 1;
+      background: linear-gradient(145deg, var(--navy) 0%, #162340 40%, #0e1c35 100%);
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      padding: 60px 50px; position: relative; overflow: hidden;
+    }
+    .panel-left::before {
+      content: ''; position: absolute; width: 420px; height: 420px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(62,198,198,.18) 0%, transparent 70%);
+      top: -80px; right: -80px;
+    }
+    .panel-left::after {
+      content: ''; position: absolute; width: 280px; height: 280px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(46,95,163,.25) 0%, transparent 70%);
+      bottom: -60px; left: -60px;
+    }
+    .grid-bg {
+      position: absolute; inset: 0;
+      background-image: linear-gradient(rgba(62,198,198,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(62,198,198,.06) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .brand { position: relative; z-index: 2; text-align: center; animation: fadeUp .8s ease both; }
+    .logo-svg { width: 220px; margin-bottom: 32px; filter: drop-shadow(0 8px 24px rgba(62,198,198,.35)); }
+    .brand-name { font-size: 2.6rem; font-weight: 800; letter-spacing: -1px; color: var(--white); }
+    .brand-name span { color: var(--teal); }
+    .brand-sub { font-size: .95rem; font-weight: 300; letter-spacing: 4px; text-transform: uppercase; color: rgba(255,255,255,.45); margin-top: 6px; }
+    .tagline { margin-top: 48px; color: rgba(255,255,255,.55); font-size: 1rem; line-height: 1.7; max-width: 320px; text-align: center; }
+    .dots { display: flex; gap: 8px; margin-top: 40px; justify-content: center; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.2); }
+    .dot.active { background: var(--teal); width: 24px; border-radius: 4px; }
 
-body {
-  font-family: var(--font-sans);
-  background: var(--c-bg);
-  color: var(--c-dark);
-  min-height: 100vh;
-  overflow-x: hidden;
-}
+    .panel-right {
+      width: 480px; min-height: 100vh; background: var(--white);
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 60px 52px; box-shadow: -12px 0 48px rgba(30,45,78,.08);
+    }
+    .form-header { margin-bottom: 44px; animation: fadeUp .6s .15s ease both; }
+    .form-header h2 { font-size: 1.9rem; font-weight: 700; color: var(--navy); }
+    .form-header p { color: var(--gray); margin-top: 6px; font-size: .95rem; }
 
-/* ── GRAIN TEXTURE ── */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 0;
-  opacity: .4;
-}
+    .form-group { margin-bottom: 22px; animation: fadeUp .6s .25s ease both; }
+    .form-group label { display: block; font-size: .8rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--navy); margin-bottom: 8px; }
+    .form-group input {
+      width: 100%; padding: 14px 18px; border: 1.5px solid #DDE3EE; border-radius: 10px;
+      font-family: 'Outfit', sans-serif; font-size: 1rem; color: var(--navy);
+      background: var(--light); outline: none; transition: border-color .2s, box-shadow .2s;
+    }
+    .form-group input:focus { border-color: var(--teal); box-shadow: 0 0 0 4px rgba(62,198,198,.12); }
+    .form-group input::placeholder { color: #b0bac8; }
 
-/* ── HERO ── */
-.hero {
-  position: relative;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem 1.5rem 2rem;
-  overflow: hidden;
-}
+    .form-options { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; animation: fadeUp .6s .3s ease both; }
+    .remember { display: flex; align-items: center; gap: 8px; font-size: .88rem; color: var(--gray); cursor: pointer; }
+    .remember input[type=checkbox] { accent-color: var(--teal); width: 15px; height: 15px; }
+    .forgot { font-size: .88rem; color: var(--teal); text-decoration: none; font-weight: 500; }
+    .forgot:hover { text-decoration: underline; }
 
-/* Background circles décoratifs */
-.hero::after {
-  content: '';
-  position: absolute;
-  width: 700px;
-  height: 700px;
-  border-radius: 50%;
-  border: 1px solid rgba(45,90,39,.08);
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  animation: breathe 8s ease-in-out infinite;
-}
-@keyframes breathe {
-  0%, 100% { transform: translate(-50%,-50%) scale(1); opacity: .5; }
-  50%       { transform: translate(-50%,-50%) scale(1.04); opacity: .9; }
-}
+    .btn-login {
+      width: 100%; padding: 15px;
+      background: linear-gradient(135deg, var(--blue), var(--teal));
+      color: #fff; font-family: 'Outfit', sans-serif; font-size: 1rem; font-weight: 700;
+      border: none; border-radius: 10px; cursor: pointer; letter-spacing: .5px;
+      transition: transform .15s, box-shadow .2s, opacity .2s;
+      box-shadow: 0 6px 20px rgba(62,198,198,.35);
+      animation: fadeUp .6s .35s ease both;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .btn-login:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(62,198,198,.45); }
+    .btn-login:active { transform: translateY(0); }
+    .btn-login:disabled { opacity: .65; cursor: not-allowed; transform: none; }
 
-.deco-ring {
-  position: absolute;
-  border-radius: 50%;
-  border: 1px solid rgba(45,90,39,.05);
-  pointer-events: none;
-}
-.deco-ring.r1 { width: 900px; height: 900px; top: 50%; left: 50%; transform: translate(-50%,-50%); }
-.deco-ring.r2 { width: 500px; height: 500px; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+    .spinner {
+      width: 18px; height: 18px; border: 2px solid rgba(255,255,255,.4); border-top-color: white;
+      border-radius: 50%; animation: spin .6s linear infinite; display: none;
+    }
+    .btn-login.loading .spinner { display: block; }
+    .btn-login.loading .btn-text { opacity: .7; }
 
-/* Blobs de couleur */
-.blob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: .18;
-  pointer-events: none;
-}
-.blob.b1 { width: 400px; height: 400px; background: var(--c-green); top: -10%; right: -8%; }
-.blob.b2 { width: 300px; height: 300px; background: var(--c-accent); bottom: 5%; left: -5%; }
+    .alert { padding: 12px 16px; border-radius: 10px; font-size: .88rem; margin-bottom: 18px; display: none; animation: fadeUp .3s ease; }
+    .alert.error   { background: #fff0f0; border: 1px solid #fcc; color: #c0392b; display: block; }
+    .alert.success { background: #f0fff8; border: 1px solid #9de; color: #1a7a5e; display: block; }
 
-/* ── BADGE ── */
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.4rem 1rem;
-  border: 1px solid var(--c-border);
-  border-radius: 999px;
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: var(--c-muted);
-  background: rgba(255,255,255,.6);
-  backdrop-filter: blur(8px);
-  margin-bottom: 2rem;
-  opacity: 0;
-  animation: fadeUp .6s .1s forwards;
-}
-.hero-badge .dot {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: var(--c-green);
-  animation: pulse 2s ease-in-out infinite;
-}
-@keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: .5; transform: scale(.7); }
-}
+    /* Modal */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(14,28,53,.55); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 999; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: white; border-radius: 20px; padding: 36px 40px; width: 400px; box-shadow: 0 24px 64px rgba(14,28,53,.25); animation: fadeUp .3s ease; }
+    .modal h3 { font-size: 1.3rem; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+    .modal p { font-size: .88rem; color: var(--gray); margin-bottom: 22px; }
+    .modal-actions { display: flex; gap: 12px; margin-top: 20px; }
+    .btn-cancel { flex: 1; padding: 12px; border: 1.5px solid #DDE3EE; border-radius: 10px; background: none; color: var(--gray); font-family: 'Outfit', sans-serif; font-size: .9rem; font-weight: 600; cursor: pointer; }
+    .btn-send { flex: 1; padding: 12px; background: linear-gradient(135deg, var(--blue), var(--teal)); color: white; border: none; border-radius: 10px; font-family: 'Outfit', sans-serif; font-size: .9rem; font-weight: 700; cursor: pointer; }
 
-/* ── LOGO / NOM ── */
-.hero-logo {
-  width: 72px;
-  height: 72px;
-  border-radius: 18px;
-  background: var(--c-green);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 12px 40px rgba(45,90,39,.25), 0 2px 8px rgba(0,0,0,.1);
-  opacity: 0;
-  animation: fadeUp .6s .2s forwards;
-  overflow: hidden;
-}
-.hero-logo img { width: 100%; height: 100%; object-fit: contain; }
+    .footer-note { margin-top: 48px; text-align: center; font-size: .78rem; color: #b0bac8; letter-spacing: .5px; animation: fadeUp .6s .45s ease both; }
 
-.hero-title {
-  font-family: var(--font-serif);
-  font-size: clamp(2.6rem, 6vw, 4.2rem);
-  font-weight: 600;
-  text-align: center;
-  line-height: 1.05;
-  color: var(--c-dark);
-  margin-bottom: .6rem;
-  opacity: 0;
-  animation: fadeUp .6s .3s forwards;
-}
-.hero-title em {
-  font-style: italic;
-  color: var(--c-green);
-}
-
-.hero-subtitle {
-  font-size: 1rem;
-  color: var(--c-muted);
-  text-align: center;
-  font-weight: 300;
-  margin-bottom: 3rem;
-  max-width: 480px;
-  line-height: 1.6;
-  opacity: 0;
-  animation: fadeUp .6s .4s forwards;
-}
-
-/* ── CARDS PORTAIL ── */
-.portal-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.25rem;
-  width: 100%;
-  max-width: 680px;
-  opacity: 0;
-  animation: fadeUp .7s .5s forwards;
-}
-
-.portal-card {
-  position: relative;
-  border-radius: 20px;
-  padding: 2rem 1.75rem;
-  text-decoration: none;
-  color: inherit;
-  overflow: hidden;
-  transition: transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .25s;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-.portal-card:hover {
-  transform: translateY(-5px) scale(1.01);
-}
-
-/* Revendeur card */
-.portal-card.revendeur {
-  background: var(--c-green);
-  color: white;
-  box-shadow: 0 8px 40px rgba(45,90,39,.3), 0 2px 8px rgba(0,0,0,.1);
-}
-.portal-card.revendeur:hover {
-  box-shadow: 0 16px 56px rgba(45,90,39,.38), 0 4px 12px rgba(0,0,0,.12);
-}
-
-/* Admin card */
-.portal-card.admin {
-  background: var(--c-paper);
-  color: var(--c-dark);
-  border: 1px solid var(--c-border);
-  box-shadow: 0 4px 24px rgba(0,0,0,.07);
-}
-.portal-card.admin:hover {
-  box-shadow: 0 12px 40px rgba(0,0,0,.12);
-}
-
-/* Deco shape inside cards */
-.portal-card::before {
-  content: '';
-  position: absolute;
-  width: 180px;
-  height: 180px;
-  border-radius: 50%;
-  right: -50px;
-  bottom: -60px;
-  pointer-events: none;
-  transition: transform .3s;
-}
-.portal-card:hover::before { transform: scale(1.15); }
-.portal-card.revendeur::before { background: rgba(255,255,255,.07); }
-.portal-card.admin::before { background: var(--c-green-l); }
-
-.card-tag {
-  font-size: 0.67rem;
-  font-weight: 700;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  margin-bottom: 1.1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-.portal-card.revendeur .card-tag { opacity: .75; }
-.portal-card.admin .card-tag { color: var(--c-muted); }
-
-.card-icon {
-  font-size: 2.4rem;
-  margin-bottom: .9rem;
-  display: block;
-  line-height: 1;
-}
-
-.card-title {
-  font-family: var(--font-serif);
-  font-size: 1.7rem;
-  font-weight: 600;
-  line-height: 1.1;
-  margin-bottom: .55rem;
-}
-
-.card-desc {
-  font-size: .84rem;
-  line-height: 1.55;
-  font-weight: 300;
-  flex: 1;
-  margin-bottom: 1.4rem;
-}
-.portal-card.revendeur .card-desc { opacity: .85; }
-.portal-card.admin .card-desc { color: var(--c-muted); }
-
-.card-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: .5rem;
-  font-size: .82rem;
-  font-weight: 600;
-  letter-spacing: .04em;
-  padding: .55rem 1.15rem;
-  border-radius: 999px;
-  transition: all .2s;
-  width: fit-content;
-}
-.portal-card.revendeur .card-cta {
-  background: rgba(255,255,255,.18);
-  color: white;
-  border: 1px solid rgba(255,255,255,.3);
-}
-.portal-card.revendeur:hover .card-cta {
-  background: rgba(255,255,255,.28);
-}
-.portal-card.admin .card-cta {
-  background: var(--c-green);
-  color: white;
-  border: 1px solid transparent;
-  box-shadow: 0 2px 12px rgba(45,90,39,.25);
-}
-.portal-card.admin:hover .card-cta {
-  background: #234820;
-}
-
-.cta-arrow {
-  transition: transform .2s;
-}
-.portal-card:hover .cta-arrow { transform: translateX(3px); }
-
-/* ── FEATURES ── */
-.features {
-  width: 100%;
-  max-width: 680px;
-  margin-top: 3.5rem;
-  opacity: 0;
-  animation: fadeUp .6s .7s forwards;
-  display: flex;
-  justify-content: center;
-  gap: 2.5rem;
-  flex-wrap: wrap;
-}
-.feature {
-  display: flex;
-  align-items: center;
-  gap: .5rem;
-  font-size: .78rem;
-  color: var(--c-muted);
-  font-weight: 400;
-}
-.feature .feat-icon {
-  font-size: 1rem;
-}
-
-/* ── FOOTER ── */
-.footer {
-  padding: 1.5rem;
-  text-align: center;
-  font-size: .72rem;
-  color: var(--c-muted);
-  opacity: 0;
-  animation: fadeUp .5s .9s forwards;
-  position: relative;
-  z-index: 1;
-}
-.footer a { color: var(--c-muted); text-decoration: underline; text-underline-offset: 3px; }
-.footer .sep { margin: 0 .6rem; opacity: .4; }
-
-/* ── STATUS BADGE ── */
-.status-strip {
-  width: 100%;
-  max-width: 680px;
-  margin-top: 1.5rem;
-  background: rgba(255,255,255,.55);
-  border: 1px solid var(--c-border);
-  border-radius: 12px;
-  padding: .75rem 1.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  backdrop-filter: blur(8px);
-  opacity: 0;
-  animation: fadeUp .6s .6s forwards;
-  flex-wrap: wrap;
-}
-.status-item {
-  display: flex;
-  align-items: center;
-  gap: .5rem;
-  font-size: .75rem;
-  color: var(--c-muted);
-}
-.status-item strong {
-  color: var(--c-dark);
-  font-weight: 600;
-}
-.status-dot {
-  width: 7px; height: 7px;
-  border-radius: 50%;
-  background: #4caf50;
-  flex-shrink: 0;
-  box-shadow: 0 0 0 2px rgba(76,175,80,.2);
-}
-.status-val {
-  font-family: var(--font-mono);
-  font-size: .72rem;
-  padding: 1px 7px;
-  background: var(--c-green-l);
-  color: var(--c-green);
-  border-radius: 4px;
-  font-weight: 500;
-}
-
-/* ── ANIMATIONS ── */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(22px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ── RESPONSIVE ── */
-@media (max-width: 560px) {
-  .portal-grid { grid-template-columns: 1fr; max-width: 360px; }
-  .hero-title { font-size: 2.2rem; }
-  .features { gap: 1.2rem; }
-  .status-strip { justify-content: center; }
-}
-</style>
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @media (max-width: 860px) { .panel-left { display: none; } .panel-right { width: 100%; padding: 48px 28px; } }
+  </style>
 </head>
 <body>
 
-<div class="hero">
-  <!-- Décorations -->
-  <div class="blob b1"></div>
-  <div class="blob b2"></div>
-  <div class="deco-ring r1"></div>
-  <div class="deco-ring r2"></div>
-
-  <!-- Badge statut -->
-  <div class="hero-badge">
-    <span class="dot"></span>
-    Plateforme de commandes en ligne
+<div class="panel-left">
+  <div class="grid-bg"></div>
+  <div class="brand">
+    <svg class="logo-svg" viewBox="0 0 260 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="cg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#3EC6C6"/>
+          <stop offset="100%" stop-color="#2E5FA3"/>
+        </linearGradient>
+      </defs>
+      <path d="M55 130 Q30 130 30 108 Q30 90 50 88 Q50 62 74 62 Q80 44 100 44 Q122 44 130 62 Q148 62 152 80 Q168 80 168 100 Q168 130 140 130 Z" fill="url(#cg)" opacity=".95"/>
+      <text x="68" y="108" font-family="monospace" font-size="36" font-weight="700" fill="white">&lt;/&gt;</text>
+    </svg>
+    <div class="brand-name">LOAC <span>DEV</span></div>
+    <div class="brand-sub">Solutions</div>
+    <p class="tagline">Votre espace centralisé pour piloter vos solutions métier sur mesure.</p>
+    <div class="dots"><div class="dot active"></div><div class="dot"></div><div class="dot"></div></div>
   </div>
-
-  <!-- Logo dynamique -->
-  <div class="hero-logo" id="hero-logo">
-    <span id="logo-fallback">🌿</span>
-  </div>
-
-  <!-- Titre -->
-  <h1 class="hero-title" id="hero-title">
-    Bienvenue chez<br><em id="nom-societe">votre producteur</em>
-  </h1>
-  <p class="hero-subtitle" id="hero-subtitle">
-    Passez vos commandes en ligne, consultez notre catalogue et gérez votre relation commerciale simplement.
-  </p>
-
-  <!-- Portail -->
-  <div class="portal-grid">
-
-    <a class="portal-card revendeur" href="commande.html">
-      <div class="card-tag">
-        <span>🛒</span> Revendeur
-      </div>
-      <span class="card-icon">📋</span>
-      <div class="card-title">Passer une commande</div>
-      <p class="card-desc">Accédez au catalogue, sélectionnez vos produits et envoyez votre bon de commande directement.</p>
-      <div class="card-cta">
-        Accéder au bon de commande
-        <span class="cta-arrow">→</span>
-      </div>
-    </a>
-
-    <a class="portal-card admin" href="admin.html">
-      <div class="card-tag">
-        <span>⚙️</span> Administration
-      </div>
-      <span class="card-icon">🗂️</span>
-      <div class="card-title">Espace administration</div>
-      <p class="card-desc">Configurez le catalogue, les tarifs, les remises et la charte graphique de la plateforme.</p>
-      <div class="card-cta">
-        Ouvrir l'administration
-        <span class="cta-arrow">→</span>
-      </div>
-    </a>
-
-  </div>
-
-  <!-- Bande statut config -->
-  <div class="status-strip" id="status-strip">
-    <div class="status-item">
-      <span class="status-dot"></span>
-      <span>Collection active : <strong id="status-collection">—</strong></span>
-    </div>
-    <div class="status-item">
-      <span id="status-produits" class="status-val">—</span>
-      <span>produits</span>
-    </div>
-    <div class="status-item">
-      <span id="status-remises" class="status-val">—</span>
-      <span>profils remise</span>
-    </div>
-    <div class="status-item" id="status-limite-wrap" style="display:none">
-      📅 Commandes avant le <strong id="status-limite">—</strong>
-    </div>
-  </div>
-
-  <!-- Features -->
-  <div class="features">
-    <div class="feature"><span class="feat-icon">📥</span> Import CSV & JSON</div>
-    <div class="feature"><span class="feat-icon">🏷️</span> Remises personnalisées</div>
-    <div class="feature"><span class="feat-icon">📨</span> Envoi par email</div>
-    <div class="feature"><span class="feat-icon">🎨</span> Charte adaptable</div>
-    <div class="feature"><span class="feat-icon">📱</span> Compatible mobile</div>
-  </div>
-
 </div>
 
-<!-- FOOTER -->
-<footer class="footer">
-  <span id="footer-societe">CRM Commandes</span>
-  <span class="sep">·</span>
-  <a href="commande.html">Bon de commande</a>
-  <span class="sep">·</span>
-  <a href="admin.html">Administration</a>
-  <span class="sep">·</span>
-  <a href="README.md">Documentation</a>
-</footer>
+<div class="panel-right">
+  <div class="form-header">
+    <h2>Bienvenue 👋</h2>
+    <p>Connectez-vous à votre espace LOAC DEV</p>
+  </div>
+
+  <div class="alert" id="alertMsg"></div>
+
+  <div class="form-group">
+    <label>Email</label>
+    <input type="email" id="email" placeholder="votre@email.com" autocomplete="email"/>
+  </div>
+  <div class="form-group">
+    <label>Mot de passe</label>
+    <input type="password" id="password" placeholder="••••••••" autocomplete="current-password"/>
+  </div>
+
+  <div class="form-options">
+    <label class="remember"><input type="checkbox" id="remember"/> Se souvenir de moi</label>
+    <a href="#" class="forgot" onclick="openForgot(event)">Mot de passe oublié ?</a>
+  </div>
+
+  <button class="btn-login" id="btnLogin" onclick="handleLogin()">
+    <div class="spinner"></div>
+    <span class="btn-text">Se connecter →</span>
+  </button>
+
+  <div class="footer-note">© 2026 LOAC DEV Solutions — Tous droits réservés</div>
+</div>
+
+<!-- Modal reset -->
+<div class="modal-overlay" id="forgotModal">
+  <div class="modal">
+    <h3>Réinitialiser le mot de passe</h3>
+    <p>Entrez votre email, vous recevrez un lien de réinitialisation.</p>
+    <div class="form-group" style="margin-bottom:0">
+      <label>Email</label>
+      <input type="email" id="resetEmail" placeholder="votre@email.com"/>
+    </div>
+    <div class="alert" id="resetAlert"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeForgot()">Annuler</button>
+      <button class="btn-send" onclick="handleReset()">Envoyer →</button>
+    </div>
+  </div>
+</div>
 
 <script>
-// Charge la config depuis localStorage ou config.json et personnalise la page
-const CONFIG_KEY = 'crm_config';
+  const SUPABASE_URL = 'https://nbebeuelpuokzonbqvfo.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5iZWJldWVscHVva3pvbmJxdmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxMDkwMTAsImV4cCI6MjA5MDY4NTAxMH0.mgL_C09g9CiYF5fA0W_-COgmf44PFfGRC2wB_-cm0gU';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-function applyConfig(cfg) {
-  if (!cfg) return;
-  const s = cfg.societe || {};
-  const c = cfg.collection || {};
-  const ch = cfg.charte || {};
+  // Redirection si déjà connecté
+  sb.auth.getSession().then(({ data }) => {
+    if (data.session) window.location.href = 'dashboard.html';
+  });
 
-  // Nom société
-  const nom = s.nom || 'votre producteur';
-  document.getElementById('nom-societe').textContent = nom;
-  document.getElementById('footer-societe').textContent = nom;
-  document.title = 'Bienvenue — ' + nom;
-
-  // Logo
-  if (s.logo_url) {
-    const img = document.createElement('img');
-    img.src = s.logo_url;
-    img.alt = nom;
-    img.onerror = () => {};
-    document.getElementById('logo-fallback').style.display = 'none';
-    document.getElementById('hero-logo').appendChild(img);
+  function setLoading(on) {
+    const btn = document.getElementById('btnLogin');
+    btn.disabled = on;
+    btn.classList.toggle('loading', on);
   }
 
-  // Slogan
-  if (s.slogan) {
-    document.getElementById('hero-subtitle').textContent = s.slogan;
+  function showAlert(id, type, msg) {
+    const el = document.getElementById(id);
+    el.className = 'alert ' + type;
+    el.textContent = msg;
   }
 
-  // Collection
-  if (c.nom) {
-    document.getElementById('status-collection').textContent = c.nom;
-  }
-  if (c.date_limite_commande) {
-    document.getElementById('status-limite').textContent = c.date_limite_commande;
-    document.getElementById('status-limite-wrap').style.display = 'flex';
+  async function handleLogin() {
+    const email    = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    document.getElementById('alertMsg').className = 'alert';
+
+    if (!email || !password) {
+      showAlert('alertMsg', 'error', 'Veuillez remplir tous les champs.');
+      return;
+    }
+
+    setLoading(true);
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    setLoading(false);
+
+    if (error) {
+      const msgs = {
+        'Invalid login credentials': 'Email ou mot de passe incorrect.',
+        'Email not confirmed':        'Veuillez confirmer votre email avant de vous connecter.',
+        'Too many requests':          'Trop de tentatives. Réessayez dans quelques minutes.',
+      };
+      showAlert('alertMsg', 'error', msgs[error.message] || error.message);
+      return;
+    }
+
+    window.location.href = 'dashboard.html';
   }
 
-  // Stats
-  const nb = (cfg.catalogue || []).length;
-  document.getElementById('status-produits').textContent = nb;
-  document.getElementById('status-remises').textContent = (cfg.remises || []).length;
-
-  // Couleurs
-  if (ch.couleur_principale) {
-    document.documentElement.style.setProperty('--c-green', ch.couleur_principale);
+  function openForgot(e) {
+    e.preventDefault();
+    document.getElementById('forgotModal').classList.add('open');
+    document.getElementById('resetEmail').value = document.getElementById('email').value;
   }
-  if (ch.couleur_secondaire) {
-    document.documentElement.style.setProperty('--c-bg', ch.couleur_secondaire);
+  function closeForgot() {
+    document.getElementById('forgotModal').classList.remove('open');
+    document.getElementById('resetAlert').className = 'alert';
   }
-  if (ch.couleur_accent) {
-    document.documentElement.style.setProperty('--c-accent', ch.couleur_accent);
+
+  async function handleReset() {
+    const email = document.getElementById('resetEmail').value.trim();
+    if (!email) { showAlert('resetAlert', 'error', 'Entrez votre email.'); return; }
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + '/index.html'
+    });
+    if (error) { showAlert('resetAlert', 'error', error.message); }
+    else { showAlert('resetAlert', 'success', 'Email envoyé ! Vérifiez votre boîte mail.'); setTimeout(closeForgot, 2500); }
   }
-}
 
-// 1. Depuis localStorage
-try {
-  const raw = localStorage.getItem(CONFIG_KEY);
-  if (raw) { applyConfig(JSON.parse(raw)); }
-} catch(e) {}
-
-// 2. Depuis config.json (peut enrichir)
-fetch('config.json?t=' + Date.now())
-  .then(r => r.ok ? r.json() : null)
-  .then(data => { if (data) applyConfig(data); })
-  .catch(() => {});
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      if (document.getElementById('forgotModal').classList.contains('open')) handleReset();
+      else handleLogin();
+    }
+  });
 </script>
 </body>
 </html>
