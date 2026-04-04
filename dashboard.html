@@ -6,6 +6,7 @@
   <title>LOAC DEV Solutions — Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -187,6 +188,80 @@
     .crm-overlay-bar .open-new { margin-left: auto; background: rgba(62,198,198,.2); border: none; color: var(--teal); padding: 7px 14px; border-radius: 8px; font-family: 'Outfit', sans-serif; font-size: .82rem; font-weight: 600; cursor: pointer; text-decoration: none; }
     .crm-overlay iframe { flex: 1; border: none; width: 100%; }
 
+    /* PAGE : NOUVEAU CLIENT CRM */
+    .setup-wrap { display: grid; grid-template-columns: 220px 1fr; gap: 20px; align-items: start; }
+    .setup-nav-box { background: var(--white); border-radius: 14px; overflow: hidden; box-shadow: 0 2px 12px rgba(30,45,78,.07); position: sticky; top: 20px; }
+    .setup-nav-top { padding: .55rem 1rem; font-size: .6rem; letter-spacing: .14em; text-transform: uppercase; color: var(--gray); font-weight: 600; background: var(--light); border-bottom: 1px solid #eef2fb; }
+    .setup-ni { display: flex; align-items: center; gap: .5rem; padding: .6rem 1rem; cursor: pointer; font-size: .8rem; color: var(--gray); border-left: 2px solid transparent; transition: all .12s; }
+    .setup-ni:hover { color: var(--navy); background: rgba(62,198,198,.05); }
+    .setup-ni.active { color: var(--teal); border-left-color: var(--teal); background: rgba(62,198,198,.08); font-weight: 600; }
+    .setup-ni-dot { width: 7px; height: 7px; border-radius: 50%; background: #dde3ee; flex-shrink: 0; }
+    .setup-ni.ok .setup-ni-dot { background: var(--teal2); }
+    .setup-status-bar { background: var(--white); border-radius: 12px; padding: .65rem 1rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .4rem; box-shadow: 0 1px 6px rgba(30,45,78,.06); }
+    .setup-si { font-size: .7rem; display: flex; align-items: center; gap: .3rem; }
+    .setup-si.ok { color: var(--teal2); } .setup-si.no { color: var(--gray); }
+    .setup-section { background: var(--white); border-radius: 14px; margin-bottom: .9rem; overflow: hidden; box-shadow: 0 2px 10px rgba(30,45,78,.06); scroll-margin-top: 20px; }
+    .setup-sh { display: flex; align-items: center; justify-content: space-between; padding: .9rem 1.25rem; border-bottom: 1px solid #eef2fb; background: var(--light); cursor: pointer; user-select: none; }
+    .setup-sh-l { display: flex; align-items: center; gap: .6rem; }
+    .setup-sh-ico { font-size: 1rem; }
+    .setup-sh-title { font-size: .88rem; font-weight: 700; color: var(--navy); }
+    .setup-sh-sub { font-size: .7rem; color: var(--gray); margin-top: 1px; }
+    .setup-sh-badge { font-size: .62rem; font-weight: 700; padding: 1px 8px; border-radius: 12px; background: rgba(62,198,198,.12); color: #1da8a8; border: 1px solid rgba(62,198,198,.2); }
+    .setup-chevron { font-size: .7rem; color: var(--gray); transition: transform .2s; }
+    .setup-section.collapsed .setup-section-body { display: none; }
+    .setup-section.collapsed .setup-chevron { transform: rotate(-90deg); }
+    .setup-section-body { padding: 1.1rem 1.25rem; }
+    .setup-fg2 { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; margin-bottom: .7rem; }
+    .setup-fg3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .7rem; margin-bottom: .7rem; }
+    .setup-fg1 { margin-bottom: .7rem; }
+    .setup-fgrp { display: flex; flex-direction: column; gap: .25rem; }
+    .setup-fl { font-size: .65rem; font-weight: 600; color: var(--gray); letter-spacing: .05em; text-transform: uppercase; }
+    .setup-req { color: var(--teal2); margin-left: 2px; }
+    .setup-fi { background: var(--light); border: 1.5px solid #dde3ee; border-radius: 8px; color: var(--navy); font-family: 'Outfit', sans-serif; font-size: .84rem; padding: 8px 11px; width: 100%; transition: border-color .18s; }
+    .setup-fi:focus { outline: none; border-color: var(--teal); }
+    .setup-fi::placeholder { color: var(--gray); }
+    select.setup-fi option { background: #fff; }
+    textarea.setup-fi { resize: vertical; min-height: 60px; }
+    .setup-hint { font-size: .64rem; color: var(--gray); margin-top: .18rem; }
+    .setup-color-row { display: flex; align-items: center; gap: .5rem; }
+    .setup-sw { width: 30px; height: 30px; border-radius: 7px; border: 1.5px solid #dde3ee; cursor: pointer; flex-shrink: 0; }
+    input[type=color].setup-cp { opacity: 0; position: absolute; pointer-events: none; width: 1px; height: 1px; }
+    .setup-prev { border-radius: 9px; padding: .6rem 1rem; display: flex; align-items: center; gap: .6rem; margin-top: .6rem; border: 1px solid #eef2fb; background: #fff; }
+    .setup-p-ico { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: .85rem; flex-shrink: 0; }
+    .setup-sb-test { border-radius: 8px; padding: .55rem .9rem; font-size: .76rem; margin-top: .55rem; }
+    .setup-sb-ok   { background: #f0fff8; border: 1px solid #9de; color: #1a7a5e; }
+    .setup-sb-err  { background: #fff0f0; border: 1px solid #fcc; color: #c0392b; }
+    .setup-sb-info { background: rgba(62,198,198,.08); border: 1px solid rgba(62,198,198,.2); color: #1da8a8; }
+    .setup-sb-warn { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+    .setup-code { background: #0f172a; color: #86efac; border-radius: 8px; padding: .85rem 1.1rem; font-family: 'DM Mono', monospace; font-size: .71rem; line-height: 1.7; white-space: pre-wrap; word-break: break-all; max-height: 180px; overflow-y: auto; margin-top: .5rem; }
+    .setup-profil-row { display: grid; grid-template-columns: 1fr 90px 28px; gap: .4rem; align-items: center; margin-bottom: .35rem; }
+    .setup-profil-row .setup-fi { padding: 6px 9px; }
+    .setup-drop { border: 2px dashed rgba(62,198,198,.25); border-radius: 9px; padding: 1.25rem; text-align: center; cursor: pointer; position: relative; transition: all .18s; }
+    .setup-drop:hover { border-color: var(--teal); background: rgba(62,198,198,.04); }
+    .setup-drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .setup-cat-tbl { width: 100%; border-collapse: collapse; font-size: .75rem; }
+    .setup-cat-tbl th { text-align: left; padding: 4px 7px; background: var(--light); font-size: .58rem; letter-spacing: .1em; text-transform: uppercase; color: var(--gray); border-bottom: 1px solid #eef2fb; }
+    .setup-cat-tbl td { padding: 3px 5px; border-bottom: 1px solid rgba(30,45,78,.04); }
+    .setup-cat-tbl input { background: var(--light); border: 1px solid #dde3ee; border-radius: 5px; padding: 3px 6px; font-family: 'Outfit', sans-serif; font-size: .73rem; color: var(--navy); width: 100%; }
+    .setup-cat-tbl input:focus { outline: none; border-color: var(--teal); }
+    .setup-deploy-box { background: linear-gradient(135deg, rgba(62,198,198,.06), rgba(46,95,163,.04)); border: 1px solid rgba(62,198,198,.15); border-radius: 10px; padding: 1.1rem; }
+    .setup-ds { display: flex; gap: .65rem; margin-bottom: .8rem; }
+    .setup-ds:last-child { margin-bottom: 0; }
+    .setup-ds-num { width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, var(--teal2), var(--teal)); color: #fff; font-size: .72rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+    .setup-ds h4 { font-size: .82rem; font-weight: 700; color: var(--navy); margin-bottom: .15rem; }
+    .setup-ds p { font-size: .75rem; color: var(--gray); line-height: 1.5; }
+    .setup-ds code { background: var(--light); border: 1px solid #dde3ee; border-radius: 4px; padding: 1px 5px; font-size: .7rem; color: var(--teal2); font-family: 'DM Mono', monospace; }
+    .setup-cfg-out { background: #0f172a; border-radius: 10px; overflow: hidden; margin-bottom: 1rem; }
+    .setup-cfg-head { display: flex; align-items: center; justify-content: space-between; padding: .55rem .9rem; border-bottom: 1px solid rgba(255,255,255,.08); }
+    .setup-cfg-head span { color: #94a3b8; font-size: .7rem; font-family: 'DM Mono', monospace; }
+    .setup-cfg-pre { padding: .9rem; font-family: 'DM Mono', monospace; font-size: .7rem; color: #86efac; line-height: 1.7; white-space: pre-wrap; word-break: break-all; max-height: 240px; overflow-y: auto; }
+    .setup-btn { display: inline-flex; align-items: center; gap: .35rem; padding: .45rem .9rem; border-radius: 8px; border: none; cursor: pointer; font-family: 'Outfit', sans-serif; font-size: .78rem; font-weight: 700; transition: all .15s; white-space: nowrap; }
+    .setup-btn-teal { background: linear-gradient(135deg, var(--teal2), var(--teal)); color: #fff; }
+    .setup-btn-teal:hover { opacity: .85; }
+    .setup-btn-outline { background: transparent; border: 1.5px solid #dde3ee; color: var(--gray); }
+    .setup-btn-outline:hover { border-color: var(--teal); color: var(--teal); }
+    .setup-btn-danger { background: none; border: none; cursor: pointer; color: #ef4444; font-size: .85rem; padding: .2rem .4rem; }
+
     @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes spin   { to { transform: rotate(360deg); } }
   </style>
@@ -228,8 +303,11 @@
     </button>
 
     <div class="nav-label">Compte</div>
+    <button class="nav-item" onclick="showPage('nouveau-crm', this)">
+      <span class="icon">⚙️</span> Nouveau client CRM
+    </button>
     <button class="nav-item" onclick="showPage('parametres', this)">
-      <span class="icon">⚙️</span> Paramètres
+      <span class="icon">🔧</span> Paramètres
     </button>
     <button class="nav-item" onclick="showPage('support', this)">
       <span class="icon">📞</span> Support
@@ -442,7 +520,7 @@
       <div class="support-info-card">
         <div class="s-icon">📧</div>
         <h4>Email</h4>
-        <p>Pour toute question technique ou commerciale<br/><a href="mailto:contact@loac-dev.fr">contact@loac-dev.fr</a></p>
+        <p>Pour toute question technique ou commerciale<br/><a href="/cdn-cgi/l/email-protection#9cfff3f2e8fdffe8dcf0f3fdffb1f8f9eab2faee"><span class="__cf_email__" data-cfemail="e1828e8f95808295a18d8e8082cc858497cf8793">[email&#160;protected]</span></a></p>
       </div>
       <div class="support-info-card">
         <div class="s-icon">⚡</div>
@@ -482,6 +560,222 @@
     </div>
   </div>
 
+  <!-- ── PAGE : NOUVEAU CLIENT CRM ── -->
+  <div class="page" id="page-nouveau-crm" style="padding:28px 36px">
+    <div class="topbar">
+      <div>
+        <h1>Nouveau client CRM</h1>
+        <p>Configurez et déployez un CRM white-label — tout en une page</p>
+      </div>
+      <button class="setup-btn setup-btn-teal" onclick="setupTelechargerConfig()">⬇️ Télécharger config.js</button>
+    </div>
+
+    <div class="setup-wrap">
+
+      <!-- NAV STICKY -->
+      <aside>
+        <div class="setup-nav-box">
+          <div class="setup-nav-top">Sections</div>
+          <div class="setup-ni active" id="sni-s" onclick="setupGoSec('ss-societe','sni-s')"><div class="setup-ni-dot"></div>🏢 Société</div>
+          <div class="setup-ni" id="sni-t" onclick="setupGoSec('ss-theme','sni-t')"><div class="setup-ni-dot"></div>🎨 Apparence</div>
+          <div class="setup-ni" id="sni-sb" onclick="setupGoSec('ss-supabase','sni-sb')"><div class="setup-ni-dot"></div>🗄️ Supabase</div>
+          <div class="setup-ni" id="sni-c" onclick="setupGoSec('ss-catalogue','sni-c')"><div class="setup-ni-dot"></div>📦 Catalogue</div>
+          <div class="setup-ni" id="sni-p" onclick="setupGoSec('ss-profils','sni-p')"><div class="setup-ni-dot"></div>👥 Profils</div>
+          <div class="setup-ni" id="sni-cond" onclick="setupGoSec('ss-conditions','sni-cond')"><div class="setup-ni-dot"></div>📜 Conditions</div>
+          <div style="height:1px;background:#eef2fb;margin:.25rem 0"></div>
+          <div class="setup-ni" id="sni-d" onclick="setupGoSec('ss-deploy','sni-d');setupGenConfig()"><div class="setup-ni-dot"></div>🚀 Déploiement</div>
+          <div style="padding:.75rem">
+            <button class="setup-btn setup-btn-teal" style="width:100%;justify-content:center" onclick="setupTelechargerConfig()">⬇️ config.js</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- CONTENU -->
+      <div>
+        <!-- STATUS -->
+        <div class="setup-status-bar">
+          <span style="font-size:.74rem;font-weight:700;color:var(--navy)">État</span>
+          <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+            <span class="setup-si" id="ssi-nom"><span>○</span> Société</span>
+            <span class="setup-si" id="ssi-sb"><span>○</span> Supabase</span>
+            <span class="setup-si" id="ssi-cat"><span>○</span> Catalogue</span>
+            <span class="setup-si" id="ssi-pwd"><span>○</span> Mot de passe</span>
+          </div>
+          <button class="setup-btn setup-btn-outline" style="font-size:.72rem;padding:.3rem .7rem" onclick="setupToutOuvrir()">↕ Tout ouvrir</button>
+        </div>
+
+        <!-- SOCIÉTÉ -->
+        <div class="setup-section" id="ss-societe">
+          <div class="setup-sh" onclick="setupToggle('ss-societe')">
+            <div class="setup-sh-l"><span class="setup-sh-ico">🏢</span><div><div class="setup-sh-title">Société</div><div class="setup-sh-sub">Nom, email commandes, coordonnées</div></div></div>
+            <span class="setup-chevron">▾</span>
+          </div>
+          <div class="setup-section-body">
+            <div class="setup-fg2">
+              <div class="setup-fgrp"><label class="setup-fl">Nom société <span class="setup-req">*</span></label><input class="setup-fi" id="sfi-nom" placeholder="Ex: Épicerie Dupont" oninput="setupUpd();setupUpdPrev()"></div>
+              <div class="setup-fgrp"><label class="setup-fl">Slogan</label><input class="setup-fi" id="sfi-slogan" placeholder="Votre spécialité régionale"></div>
+              <div class="setup-fgrp"><label class="setup-fl">Email réception BDC <span class="setup-req">*</span></label><input class="setup-fi" id="sfi-email" type="email" placeholder="commandes@societe.fr" oninput="setupUpd()"><span class="setup-hint">Les bons de commande arrivent ici</span></div>
+              <div class="setup-fgrp"><label class="setup-fl">Téléphone commercial</label><input class="setup-fi" id="sfi-tel" placeholder="06 XX XX XX XX"></div>
+              <div class="setup-fgrp"><label class="setup-fl">Nom du commercial</label><input class="setup-fi" id="sfi-contact" placeholder="Prénom NOM"></div>
+              <div class="setup-fgrp"><label class="setup-fl">SIRET</label><input class="setup-fi" id="sfi-siret" placeholder="XXX XXX XXX XXXXX"></div>
+            </div>
+            <div class="setup-fg1"><div class="setup-fgrp"><label class="setup-fl">Adresse</label><input class="setup-fi" id="sfi-adresse" placeholder="Rue, CP, Ville"></div></div>
+          </div>
+        </div>
+
+        <!-- APPARENCE -->
+        <div class="setup-section" id="ss-theme">
+          <div class="setup-sh" onclick="setupToggle('ss-theme')">
+            <div class="setup-sh-l"><span class="setup-sh-ico">🎨</span><div><div class="setup-sh-title">Apparence</div><div class="setup-sh-sub">Logo, couleurs, identité visuelle</div></div></div>
+            <span class="setup-chevron">▾</span>
+          </div>
+          <div class="setup-section-body">
+            <div class="setup-fg2">
+              <div class="setup-fgrp"><label class="setup-fl">Logo URL</label><input class="setup-fi" id="sfi-logo" placeholder="https://... (vide = icône)" oninput="setupUpdPrev()"></div>
+              <div class="setup-fgrp"><label class="setup-fl">Emoji icône</label><input class="setup-fi" id="sfi-emoji" placeholder="🌿" maxlength="2" oninput="setupUpdPrev()"></div>
+            </div>
+            <div class="setup-fg3">
+              <div class="setup-fgrp"><label class="setup-fl">Couleur principale</label>
+                <div class="setup-color-row"><div class="setup-sw" id="ssw1" onclick="document.getElementById('scp1').click()"></div><input type="color" class="setup-cp" id="scp1" value="#22c55e" oninput="setupSc(1)"><input class="setup-fi" id="stx1" value="#22c55e" oninput="setupSt(1)"></div></div>
+              <div class="setup-fgrp"><label class="setup-fl">Couleur foncée</label>
+                <div class="setup-color-row"><div class="setup-sw" id="ssw2" onclick="document.getElementById('scp2').click()"></div><input type="color" class="setup-cp" id="scp2" value="#15803d" oninput="setupSc(2)"><input class="setup-fi" id="stx2" value="#15803d" oninput="setupSt(2)"></div></div>
+              <div class="setup-fgrp"><label class="setup-fl">Couleur fond</label>
+                <div class="setup-color-row"><div class="setup-sw" id="ssw3" onclick="document.getElementById('scp3').click()"></div><input type="color" class="setup-cp" id="scp3" value="#f7fdf9" oninput="setupSc(3)"><input class="setup-fi" id="stx3" value="#f7fdf9" oninput="setupSt(3)"></div></div>
+            </div>
+            <div class="setup-prev" id="setup-prev"><div class="setup-p-ico" id="sp-ico" style="background:linear-gradient(135deg,#22c55e,#4ade80)">🌿</div><div><div style="font-size:.84rem;font-weight:700;color:#1e293b" id="sp-name">Nom société</div><div style="font-size:.6rem;color:#94a3b8" id="sp-sub">Bon de commande</div></div></div>
+          </div>
+        </div>
+
+        <!-- SUPABASE -->
+        <div class="setup-section" id="ss-supabase">
+          <div class="setup-sh" onclick="setupToggle('ss-supabase')">
+            <div class="setup-sh-l"><span class="setup-sh-ico">🗄️</span><div><div class="setup-sh-title">Supabase</div><div class="setup-sh-sub">Base de données isolée par client</div></div></div>
+            <span class="setup-chevron">▾</span>
+          </div>
+          <div class="setup-section-body">
+            <div style="background:rgba(62,198,198,.08);border:1px solid rgba(62,198,198,.2);border-radius:8px;padding:.6rem .9rem;margin-bottom:.75rem;font-size:.77rem;color:#1da8a8">
+              <a href="https://supabase.com" target="_blank" style="color:var(--teal2);font-weight:700">supabase.com</a> → New project → Settings → API → Project URL + anon key
+            </div>
+            <div class="setup-fg1">
+              <div class="setup-fgrp" style="margin-bottom:.65rem"><label class="setup-fl">Project URL <span class="setup-req">*</span></label><input class="setup-fi" id="sfi-sburl" placeholder="https://xxxxxxxxxxxxxxxx.supabase.co" oninput="setupResetSb();setupUpd()"></div>
+              <div class="setup-fgrp"><label class="setup-fl">Clé anon public <span class="setup-req">*</span></label><input class="setup-fi" id="sfi-sbkey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." oninput="setupResetSb();setupUpd()"></div>
+            </div>
+            <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem">
+              <button class="setup-btn setup-btn-teal" style="font-size:.76rem" onclick="setupTestSb()">🔌 Tester la connexion</button>
+              <button class="setup-btn setup-btn-outline" style="font-size:.76rem" onclick="setupCopierSQL()">📋 Copier le SQL tables</button>
+            </div>
+            <div id="setup-sb-res"></div>
+            <details style="margin-top:.65rem">
+              <summary style="font-size:.74rem;cursor:pointer;color:var(--gray)">Voir le SQL à exécuter dans Supabase → SQL Editor</summary>
+              <div class="setup-code" id="setup-sql-block" style="font-size:.68rem"></div>
+            </details>
+          </div>
+        </div>
+
+        <!-- CATALOGUE -->
+        <div class="setup-section" id="ss-catalogue">
+          <div class="setup-sh" onclick="setupToggle('ss-catalogue')">
+            <div class="setup-sh-l"><span class="setup-sh-ico">📦</span><div><div class="setup-sh-title">Catalogue produits</div><div class="setup-sh-sub">Import Excel ou PDF — saisie manuelle</div></div></div>
+            <div style="display:flex;align-items:center;gap:.4rem"><span class="setup-sh-badge" id="setup-cat-badge" style="display:none">0 produits</span><span class="setup-chevron">▾</span></div>
+          </div>
+          <div class="setup-section-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.85rem;margin-bottom:.85rem">
+              <div>
+                <div style="font-size:.67rem;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem">Import Excel</div>
+                <div class="setup-drop"><input type="file" accept=".xlsx,.xls,.csv" onchange="setupImpExcel(this)"><div style="font-size:1.8rem;margin-bottom:.3rem">📊</div><div style="font-size:.82rem;font-weight:600;color:#1e293b">Glissez votre Excel</div><div style="font-size:.7rem;color:var(--gray);margin-top:.15rem">.xlsx · .xls · .csv</div></div>
+                <div id="setup-xlsx-st" style="margin-top:.4rem;font-size:.71rem"></div>
+              </div>
+              <div>
+                <div style="font-size:.67rem;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem">Import PDF tarif</div>
+                <div class="setup-drop"><input type="file" accept=".pdf" onchange="setupImpPDF(this)"><div style="font-size:1.8rem;margin-bottom:.3rem">📄</div><div style="font-size:.82rem;font-weight:600;color:#1e293b">Glissez votre PDF</div><div style="font-size:.7rem;color:var(--gray);margin-top:.15rem">PDF natif texte</div></div>
+                <div id="setup-pdf-st" style="margin-top:.4rem;font-size:.71rem"></div>
+              </div>
+            </div>
+            <div id="setup-xlsx-map" style="display:none;border:1px solid #eef2fb;border-radius:8px;overflow:hidden;margin-bottom:.75rem">
+              <div style="background:var(--light);padding:.5rem 1rem;border-bottom:1px solid #eef2fb;display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:.76rem;font-weight:600;color:var(--navy)">🔗 Associer les colonnes</span>
+                <button class="setup-btn setup-btn-teal" style="font-size:.72rem" onclick="setupAppliquerMap()">✅ Appliquer</button>
+              </div>
+              <div style="padding:.6rem;overflow-x:auto" id="setup-map-content"></div>
+            </div>
+            <div id="setup-cat-zone" style="display:none">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
+                <span style="font-size:.78rem;font-weight:600;color:var(--navy)">Catalogue — <span id="setup-cat-count">0</span> produits</span>
+                <div style="display:flex;gap:.35rem"><button class="setup-btn setup-btn-outline" style="font-size:.71rem" onclick="setupAddProd()">+ Ligne</button><button class="setup-btn setup-btn-teal" style="font-size:.71rem" onclick="setupSaveCat()">💾 Sauvegarder Supabase</button></div>
+              </div>
+              <div style="overflow-x:auto;border:1px solid #eef2fb;border-radius:8px">
+                <table class="setup-cat-tbl"><thead><tr><th>Catégorie</th><th>Désignation</th><th>Poids</th><th>EAN</th><th>PCB</th><th>Prix HT</th><th>TVA%</th><th></th></tr></thead>
+                <tbody id="setup-cat-body"></tbody></table>
+              </div>
+            </div>
+            <div id="setup-cat-empty" style="text-align:center;padding:1rem;color:var(--gray);font-size:.77rem">
+              Importez un fichier ou <button class="setup-btn setup-btn-outline" onclick="setupAddProd()" style="margin-left:.35rem;font-size:.72rem">+ ajoutez manuellement</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PROFILS -->
+        <div class="setup-section" id="ss-profils">
+          <div class="setup-sh" onclick="setupToggle('ss-profils')">
+            <div class="setup-sh-l"><span class="setup-sh-ico">👥</span><div><div class="setup-sh-title">Profils revendeurs</div><div class="setup-sh-sub">Tarifs et remises par type de client</div></div></div>
+            <span class="setup-chevron">▾</span>
+          </div>
+          <div class="setup-section-body">
+            <div id="setup-profils-list"></div>
+            <button class="setup-btn setup-btn-outline" onclick="setupAddProfil()" style="margin-top:.3rem;font-size:.76rem">+ Ajouter un profil</button>
+            <div class="setup-hint" style="margin-top:.4rem">Remise appliquée sur le prix unitaire HT. 0 = tarif de base.</div>
+          </div>
+        </div>
+
+        <!-- CONDITIONS -->
+        <div class="setup-section" id="ss-conditions">
+          <div class="setup-sh" onclick="setupToggle('ss-conditions')">
+            <div class="setup-sh-l"><span class="setup-sh-ico">📜</span><div><div class="setup-sh-title">Conditions & CRM</div><div class="setup-sh-sub">TVA, franco de port, accès CRM</div></div></div>
+            <span class="setup-chevron">▾</span>
+          </div>
+          <div class="setup-section-body">
+            <div class="setup-fg3">
+              <div class="setup-fgrp"><label class="setup-fl">TVA %</label><input class="setup-fi" id="sfi-tva" type="number" step="0.1" value="5.5" min="0"></div>
+              <div class="setup-fgrp"><label class="setup-fl">Franco HT (EUR)</label><input class="setup-fi" id="sfi-fht" type="number" value="450" min="0"></div>
+              <div class="setup-fgrp"><label class="setup-fl">Franco colis</label><input class="setup-fi" id="sfi-fcol" type="number" value="5" min="0"></div>
+              <div class="setup-fgrp"><label class="setup-fl">Version tarif</label><input class="setup-fi" id="sfi-ver" placeholder="V1 — 2026"></div>
+              <div class="setup-fgrp"><label class="setup-fl">Mot de passe CRM <span class="setup-req">*</span></label><input class="setup-fi" id="sfi-pwd" placeholder="motdepasse2026" oninput="setupUpd()"></div>
+              <div class="setup-fgrp"><label class="setup-fl">Préfixe clients</label><input class="setup-fi" id="sfi-prefix" placeholder="CLI" maxlength="6" value="CLI"><span class="setup-hint">CLI → CLI-0001</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DÉPLOIEMENT -->
+        <div class="setup-section" id="ss-deploy">
+          <div class="setup-sh" onclick="setupToggle('ss-deploy');setupGenConfig()">
+            <div class="setup-sh-l"><span class="setup-sh-ico">🚀</span><div><div class="setup-sh-title">Déploiement</div><div class="setup-sh-sub">config.js généré automatiquement</div></div></div>
+            <span class="setup-chevron">▾</span>
+          </div>
+          <div class="setup-section-body">
+            <div id="setup-deploy-st" style="margin-bottom:.75rem"></div>
+            <div class="setup-cfg-out">
+              <div class="setup-cfg-head">
+                <span>📄 config.js</span>
+                <div style="display:flex;gap:.35rem">
+                  <button class="setup-btn" style="background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);font-size:.72rem" onclick="setupCopierConfig()">📋 Copier</button>
+                  <button class="setup-btn setup-btn-teal" style="font-size:.72rem" onclick="setupTelechargerConfig()">⬇️ Télécharger</button>
+                </div>
+              </div>
+              <pre class="setup-cfg-pre" id="setup-cfg-out"></pre>
+            </div>
+            <div class="setup-deploy-box">
+              <div class="setup-ds"><div class="setup-ds-num">1</div><div><h4>Télécharger config.js</h4><p>Cliquez "Télécharger" ci-dessus.</p></div></div>
+              <div class="setup-ds"><div class="setup-ds-num">2</div><div><h4>Créer les tables Supabase</h4><p>Supabase → SQL Editor → coller le SQL → Run.</p></div></div>
+              <div class="setup-ds"><div class="setup-ds-num">3</div><div><h4>Déposer les 5 fichiers sur le serveur</h4><p><code>config.js</code> · <code>commande.html</code> · <code>crm.html</code> · <code>prospect.html</code> · <code>setup.html</code></p></div></div>
+              <div class="setup-ds"><div class="setup-ds-num">4</div><div><h4>Ouvrir crm.html</h4><p>CRM opérationnel. Mot de passe = celui défini ci-dessus.</p></div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
 </div><!-- /content-area -->
 
 <!-- OVERLAY CRM (iframe) -->
@@ -495,7 +789,7 @@
   <iframe id="crmFrame" src="about:blank" allowfullscreen></iframe>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   const SUPABASE_URL = 'https://nbebeuelpuokzonbqvfo.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5iZWJldWVscHVva3pvbmJxdmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxMDkwMTAsImV4cCI6MjA5MDY4NTAxMH0.mgL_C09g9CiYF5fA0W_-COgmf44PFfGRC2wB_-cm0gU';
   const { createClient } = supabase;
@@ -604,13 +898,223 @@
     const el = document.getElementById(id);
     el.className = 'alert-inline ' + type;
     el.textContent = msg;
-    setTimeout(() => { el.className = 'alert-inline'; }, 5000);
   }
 
+  // ── DÉCONNEXION ──
   async function logout() {
     await sb.auth.signOut();
     window.location.href = 'index.html';
   }
+
+  /* ════════════════════════════════════════
+     CONFIGURATEUR NOUVEAU CLIENT CRM
+  ════════════════════════════════════════ */
+  const SETUP_SQL = `create table if not exists commandes (id text primary key,ref text,date text,societe text,ville text,cp text,email text,contact text,telephone text,profil text,total_ht numeric,total_colis integer,total_uvc integer,tva numeric,total_ttc numeric,franco text,lignes jsonb,commentaire text,client_id text,num_client text,created_at timestamptz default now());
+create table if not exists prospects (id text primary key,raison_sociale text,rue text,complement text,cp text,ville text,tel_magasin text,email_magasin text,surface text,siret text,tva_intra text,capital text,naf text,contact1 text,tel1 text,portable1 text,email1 text,contact2 text,tel2 text,fonction text,contact_factu text,email_factu text,jours_livraison jsonb,heure_debut text,heure_fin text,info_livraison text,potentiel text,profil text,commentaire text,created_at timestamptz default now());
+create table if not exists clients (id text primary key,num_client text,raison_sociale text,rue text,complement text,cp text,ville text,tel_magasin text,email_magasin text,surface text,siret text,tva_intra text,capital text,naf text,contact1 text,tel1 text,portable1 text,email1 text,contact2 text,tel2 text,fonction text,contact_factu text,email_factu text,jours_livraison jsonb,heure_debut text,heure_fin text,info_livraison text,potentiel text,profil text,conditions_paiement text,notes_internes text,converted_at text,created_at timestamptz default now());
+create table if not exists catalogue (id text primary key,categorie text,nom text,poids text,ean text,pcb integer,prix_ht numeric,tva numeric,description text,actif boolean default true,created_at timestamptz default now());
+alter table commandes enable row level security; alter table prospects enable row level security; alter table clients enable row level security; alter table catalogue enable row level security;
+drop policy if exists "public_all" on commandes; drop policy if exists "public_all" on prospects; drop policy if exists "public_all" on clients; drop policy if exists "public_all" on catalogue;
+create policy "public_all" on commandes for all using (true) with check (true); create policy "public_all" on prospects for all using (true) with check (true); create policy "public_all" on clients for all using (true) with check (true); create policy "public_all" on catalogue for all using (true) with check (true);`;
+
+  let setupCat = [];
+  let setupProfils = [{nom:'Tarif Standard',remise:0},{nom:'Revendeur Premium',remise:10},{nom:'Distributeur Exclusif',remise:15}];
+  let setupXlsRows = [], setupXlsHdrs = [];
+
+  // Init SQL display + swatches
+  document.getElementById('setup-sql-block').textContent = SETUP_SQL;
+  ['#22c55e','#15803d','#f7fdf9'].forEach(function(c,i){ document.getElementById('ssw'+(i+1)).style.background=c; });
+  setupRendProfils();
+  setupUpdPrev();
+
+  function sg(id){ const el=document.getElementById(id); return el?el.value.trim():''; }
+  function sesc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+  // Couleurs
+  function setupSc(n){ const v=document.getElementById('scp'+n).value; document.getElementById('ssw'+n).style.background=v; document.getElementById('stx'+n).value=v; setupUpdPrev(); }
+  function setupSt(n){ const v=document.getElementById('stx'+n).value; if(/^#[0-9a-f]{6}$/i.test(v)){ document.getElementById('scp'+n).value=v; document.getElementById('ssw'+n).style.background=v; setupUpdPrev(); } }
+
+  // Aperçu
+  function setupUpdPrev(){
+    const nom=sg('sfi-nom')||'Nom société', emoji=sg('sfi-emoji')||'🏪', logo=sg('sfi-logo'), c=sg('stx1')||'#22c55e';
+    document.getElementById('sp-name').textContent=nom;
+    document.getElementById('sp-sub').textContent=sg('sfi-slogan')||'Bon de commande';
+    const ico=document.getElementById('sp-ico');
+    if(logo){ ico.innerHTML='<img src="'+logo+'" style="width:100%;height:100%;object-fit:contain;border-radius:7px;">'; ico.style.background=''; }
+    else { ico.textContent=emoji; ico.style.background='linear-gradient(135deg,'+c+','+setupLighten(c)+')'; }
+  }
+  function setupLighten(h){ try{const r=parseInt(h.slice(1,3),16)+50,g=parseInt(h.slice(3,5),16)+50,b=parseInt(h.slice(5,7),16)+50;return'rgb('+Math.min(r,255)+','+Math.min(g,255)+','+Math.min(b,255)+')';} catch(e){return h;} }
+
+  // Status bar
+  function setupUpd(){
+    setupSi('ssi-nom',!!sg('sfi-nom'),'Société');
+    setupSi('ssi-sb',!!(sg('sfi-sburl')&&sg('sfi-sbkey')),'Supabase');
+    setupSi('ssi-cat',setupCat.length>0,'Catalogue ('+setupCat.length+')');
+    setupSi('ssi-pwd',!!sg('sfi-pwd'),'Mot de passe');
+  }
+  function setupSi(id,ok,label){ const el=document.getElementById(id); if(!el)return; el.className='setup-si '+(ok?'ok':'no'); el.innerHTML='<span>'+(ok?'✓':'○')+'</span> '+label; }
+
+  // Sections
+  function setupToggle(id){ document.getElementById(id).classList.toggle('collapsed'); }
+  function setupToutOuvrir(){ document.querySelectorAll('.setup-section').forEach(s=>s.classList.remove('collapsed')); }
+  function setupGoSec(id,nid){
+    document.querySelectorAll('.setup-ni').forEach(n=>n.classList.remove('active'));
+    document.getElementById(nid).classList.add('active');
+    const el=document.getElementById(id);
+    if(el.classList.contains('collapsed')) el.classList.remove('collapsed');
+    el.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+
+  // Supabase test
+  function setupSbU(){ return sg('sfi-sburl'); }
+  function setupSbK(){ return sg('sfi-sbkey'); }
+  function setupSbH(){ return {'Content-Type':'application/json','apikey':setupSbK(),'Authorization':'Bearer '+setupSbK(),'Prefer':'resolution=merge-duplicates,return=representation'}; }
+  function setupResetSb(){ document.getElementById('setup-sb-res').innerHTML=''; }
+  function setupShowSb(t,m){ const cls={ok:'setup-sb-ok',err:'setup-sb-err',info:'setup-sb-info',warn:'setup-sb-warn'}; document.getElementById('setup-sb-res').innerHTML='<div class="setup-sb-test '+cls[t]+'">'+m+'</div>'; }
+  function setupTestSb(){
+    if(!setupSbU()||!setupSbK()){ setupShowSb('warn','Remplissez URL et clé.'); return; }
+    setupShowSb('info','Test...');
+    fetch(setupSbU()+'/rest/v1/catalogue?select=count&limit=1',{headers:{'apikey':setupSbK(),'Authorization':'Bearer '+setupSbK()}})
+    .then(r=>{ if(r.status===200) setupShowSb('ok','✅ Connexion OK — tables trouvées.'); else if(r.status===404||r.status===400) setupShowSb('warn','⚠️ Connexion OK mais tables manquantes — exécutez le SQL.'); else setupShowSb('err','❌ Erreur HTTP '+r.status); })
+    .catch(()=>setupShowSb('err','❌ Connexion impossible.'));
+  }
+  function setupCopierSQL(){ navigator.clipboard.writeText(SETUP_SQL).then(()=>alert('SQL copié ! Collez-le dans Supabase → SQL Editor → Run')); }
+
+  // Excel
+  const SETUP_COLS = {nom:['nom','designation','libelle','produit','article','name'],poids:['poids','format','contenance','volume'],ean:['ean','ean13','code barre','barcode'],pcb:['pcb','colis','carton','colisage'],prix_ht:['prix','prix ht','pu ht','tarif','price','ht'],tva:['tva','vat','taxe'],categorie:['categorie','famille','gamme'],description:['detail','info','remarque','commentaire']};
+  const SETUP_CRMf = [{v:'',l:'— Ignorer —'},{v:'nom',l:'Désignation *'},{v:'poids',l:'Poids'},{v:'ean',l:'EAN'},{v:'pcb',l:'PCB'},{v:'prix_ht',l:'Prix HT'},{v:'tva',l:'TVA %'},{v:'categorie',l:'Catégorie'},{v:'description',l:'Description'}];
+  function setupAutoC(h){ h=h.toLowerCase().trim(); for(const f in SETUP_COLS){ for(const k of SETUP_COLS[f]){ if(h.includes(k)) return f; } } return ''; }
+
+  function setupImpExcel(input){
+    const file=input.files[0]; if(!file) return;
+    document.getElementById('setup-xlsx-st').innerHTML='<span style="color:var(--teal)">Lecture...</span>';
+    const r=new FileReader();
+    r.onload=e=>{
+      try{
+        if(typeof XLSX==='undefined'){ document.getElementById('setup-xlsx-st').innerHTML='<span style="color:#92400e">SheetJS non chargé. Utilisez la page setup.html du kit.</span>'; return; }
+        const wb=XLSX.read(e.target.result,{type:'binary'}), ws=wb.Sheets[wb.SheetNames[0]], rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+        if(!rows.length){ document.getElementById('setup-xlsx-st').innerHTML='<span style="color:#c0392b">Fichier vide</span>'; return; }
+        setupXlsRows=rows; setupXlsHdrs=Object.keys(rows[0]);
+        document.getElementById('setup-xlsx-st').innerHTML='<span style="color:var(--teal2)">✅ '+rows.length+' lignes · '+setupXlsHdrs.length+' colonnes</span>';
+        setupAffMap();
+      }catch(err){ document.getElementById('setup-xlsx-st').innerHTML='<span style="color:#c0392b">Erreur : '+err.message+'</span>'; }
+    };
+    r.readAsBinaryString(file);
+  }
+
+  function setupAffMap(){
+    const prev=setupXlsRows[0];
+    let html='<table style="width:100%;border-collapse:collapse;font-size:.74rem"><thead><tr><th style="text-align:left;padding:4px 7px;background:var(--light);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gray);border-bottom:1px solid #eef2fb">Colonne</th><th style="text-align:left;padding:4px 7px;background:var(--light);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gray);border-bottom:1px solid #eef2fb">Aperçu</th><th style="text-align:left;padding:4px 7px;background:var(--light);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gray);border-bottom:1px solid #eef2fb">Champ CRM</th></tr></thead><tbody>';
+    setupXlsHdrs.forEach((col,i)=>{
+      const sample=String(prev[col]||'').slice(0,26), auto=setupAutoC(col);
+      const opts=SETUP_CRMf.map(f=>`<option value="${f.v}"${f.v===auto?' selected':''}>${f.l}</option>`).join('');
+      html+=`<tr><td style="padding:3px 7px;font-weight:600;color:var(--navy)">${sesc(col)}</td><td style="padding:3px 7px;color:var(--gray);font-style:italic">${sesc(sample)}</td><td style="padding:3px 7px"><select class="setup-fi" id="smp-${i}" style="font-size:.72rem;padding:3px 6px">${opts}</select></td></tr>`;
+    });
+    html+='</tbody></table>';
+    document.getElementById('setup-map-content').innerHTML=html;
+    document.getElementById('setup-xlsx-map').style.display='';
+  }
+
+  function setupAppliquerMap(){
+    const mapping={};
+    setupXlsHdrs.forEach((col,i)=>{ const s=document.getElementById('smp-'+i); if(s&&s.value) mapping[col]=s.value; });
+    let added=0;
+    setupXlsRows.forEach(row=>{ const obj={}; Object.keys(mapping).forEach(col=>{ obj[mapping[col]]=String(row[col]||'').trim(); }); if(!obj.nom) return; setupCat.push({id:'xl_'+Date.now()+'_'+added,categorie:obj.categorie||'Divers',nom:obj.nom,poids:obj.poids||'',ean:obj.ean||'',pcb:parseInt(obj.pcb)||1,prix_ht:parseFloat(obj.prix_ht)||0,tva:parseFloat(obj.tva)||5.5,description:obj.description||''}); added++; });
+    document.getElementById('setup-xlsx-map').style.display='none';
+    setupRendCat(); setupUpd();
+  }
+
+  // PDF
+  function setupImpPDF(input){
+    const file=input.files[0]; if(!file) return;
+    document.getElementById('setup-pdf-st').innerHTML='<span style="color:var(--teal)">Extraction...</span>';
+    const r=new FileReader();
+    r.onload=e=>{
+      const bytes=new Uint8Array(e.target.result), txt=setupExtrPDF(bytes), prods=setupAnalyserPDF(txt);
+      if(!txt||txt.trim().length<50){ document.getElementById('setup-pdf-st').innerHTML='<span style="color:#92400e">⚠️ PDF scanné — texte non extractible. Exportez en Excel.</span>'; return; }
+      if(!prods.length){ document.getElementById('setup-pdf-st').innerHTML='<span style="color:#92400e">⚠️ Aucun produit détecté — ajoutez manuellement.</span>'; return; }
+      prods.forEach(p=>{ if(!setupCat.find(c=>c.nom===p.nom)) setupCat.push(p); });
+      setupRendCat(); setupUpd();
+      document.getElementById('setup-pdf-st').innerHTML='<span style="color:var(--teal2)">✅ '+prods.length+' produits extraits</span>';
+    };
+    r.readAsArrayBuffer(file);
+  }
+
+  function setupExtrPDF(bytes){
+    let str='',txt=''; for(let i=0;i<bytes.length;i++) str+=String.fromCharCode(bytes[i]);
+    const rePar=/\(([^)]{1,200})\)/g; let m;
+    str.split('\n').forEach(line=>{ while((m=rePar.exec(line))!==null) txt+=m[1].replace(/\\n/g,'\n').replace(/\\r/g,'').replace(/\\\(/g,'(').replace(/\\\)/g,')') +' '; if(/\bT[dD*]\b/.test(line)) txt+='\n'; });
+    if(txt.trim().length<100){ txt=''; let p=''; for(let j=0;j<bytes.length;j++){ const c=bytes[j]; if(c>=32&&c<=126) p+=String.fromCharCode(c); else if(c===10||c===13){ if(p.trim().length>3) txt+=p.trim()+'\n'; p=''; } } }
+    return txt;
+  }
+
+  function setupAnalyserPDF(txt){
+    const ligs=txt.split('\n').map(l=>l.trim()).filter(l=>l.length>2);
+    const prods=[], vus={};
+    const rePrix=/(\d{1,4}[.,]\d{2})/, reEAN=/\b(\d{13})\b/, rePCB=/(?:PCB|colis|carton)[:\-]?\s*(\d{1,3})/i, rePoids=/(\d+[.,]?\d*)\s*(g|kg|ml|cl|l)\b/i;
+    let cat0='Divers';
+    for(let i=0;i<ligs.length;i++){
+      const l=ligs[i];
+      if(!rePrix.test(l)){ if(l===l.toUpperCase()&&l.length>4&&l.length<50&&!/\d/.test(l)) cat0=l; continue; }
+      const mP=rePrix.exec(l); if(!mP) continue;
+      const prix=parseFloat(mP[1].replace(',','.')); if(prix<0.5||prix>9999) continue;
+      const mE=reEAN.exec(l), mPCB=rePCB.exec(l+(ligs[i+1]||'')), mPo=rePoids.exec(l+(ligs[i-1]||''));
+      let nom=l.replace(rePrix,'').replace(reEAN,'').replace(rePCB,'').replace(/[€EUR]+/g,'').replace(/\s{2,}/g,' ').trim();
+      if(nom.length<4){ const prev=ligs[i-1]||''; if(prev.length>4&&!rePrix.test(prev)) nom=prev.trim(); }
+      if(nom.length<3) continue;
+      const cle=nom.slice(0,20).toLowerCase(); if(vus[cle]) continue; vus[cle]=true;
+      prods.push({id:'pdf_'+Date.now()+'_'+i,categorie:cat0,nom:nom.slice(0,80),poids:mPo?mPo[1]+mPo[2]:'',ean:mE?mE[1]:'',pcb:mPCB?parseInt(mPCB[1]):1,prix_ht:prix,tva:5.5,description:''});
+    }
+    return prods;
+  }
+
+  // Catalogue render
+  function setupRendCat(){
+    const n=setupCat.length;
+    document.getElementById('setup-cat-count').textContent=n;
+    const b=document.getElementById('setup-cat-badge'); b.textContent=n+' produit'+(n>1?'s':''); b.style.display=n?'inline-flex':'none';
+    document.getElementById('setup-cat-empty').style.display=n?'none':'';
+    document.getElementById('setup-cat-zone').style.display=n?'':'none';
+    document.getElementById('setup-cat-body').innerHTML=setupCat.map((p,i)=>`<tr><td><input value="${sesc(p.categorie)}" oninput="setupCat[${i}].categorie=this.value"></td><td><input value="${sesc(p.nom)}" oninput="setupCat[${i}].nom=this.value" style="min-width:150px"></td><td><input value="${sesc(p.poids)}" oninput="setupCat[${i}].poids=this.value" style="width:55px"></td><td><input value="${sesc(p.ean)}" oninput="setupCat[${i}].ean=this.value" style="width:100px"></td><td><input type="number" value="${p.pcb}" oninput="setupCat[${i}].pcb=parseInt(this.value)||1" style="width:40px"></td><td><input type="number" step="0.01" value="${p.prix_ht}" oninput="setupCat[${i}].prix_ht=parseFloat(this.value)||0" style="width:62px"></td><td><input type="number" step="0.1" value="${p.tva}" oninput="setupCat[${i}].tva=parseFloat(this.value)||5.5" style="width:44px"></td><td><button class="setup-btn-danger" onclick="setupCat.splice(${i},1);setupRendCat();setupUpd()">🗑</button></td></tr>`).join('')||'<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:.75rem">Vide</td></tr>';
+  }
+
+  function setupAddProd(){ setupCat.push({id:'m_'+Date.now(),categorie:'Divers',nom:'Nouveau produit',poids:'',ean:'',pcb:1,prix_ht:0,tva:5.5,description:''}); setupRendCat(); document.getElementById('setup-cat-empty').style.display='none'; document.getElementById('setup-cat-zone').style.display=''; setupUpd(); }
+
+  function setupSaveCat(){
+    if(!setupSbU()||!setupSbK()){ alert('Configurez Supabase d\'abord'); return; }
+    if(!setupCat.length){ alert('Catalogue vide'); return; }
+    const rows=setupCat.map(p=>({id:p.id,categorie:p.categorie,nom:p.nom,poids:p.poids,ean:p.ean,pcb:p.pcb||1,prix_ht:p.prix_ht||0,tva:p.tva||5.5,description:p.description,actif:true}));
+    fetch(setupSbU()+'/rest/v1/catalogue',{method:'POST',headers:setupSbH(),body:JSON.stringify(rows)})
+    .then(r=>{ if(r.ok) alert('✅ '+rows.length+' produits sauvegardés dans Supabase !'); else r.json().then(d=>alert('Erreur : '+(d.message||r.status))); })
+    .catch(()=>alert('Erreur réseau'));
+  }
+
+  // Profils
+  function setupRendProfils(){
+    document.getElementById('setup-profils-list').innerHTML=setupProfils.map((p,i)=>`<div class="setup-profil-row"><input class="setup-fi" value="${sesc(p.nom)}" placeholder="Nom" oninput="setupProfils[${i}].nom=this.value"><input class="setup-fi" type="number" value="${p.remise}" min="0" max="100" style="text-align:center" oninput="setupProfils[${i}].remise=parseInt(this.value)||0"><button class="setup-btn-danger" onclick="setupProfils.splice(${i},1);setupRendProfils()">🗑</button></div>`).join('');
+  }
+  function setupAddProfil(){ setupProfils.push({nom:'Nouveau profil',remise:0}); setupRendProfils(); }
+
+  // Génération config.js
+  function setupGenConfig(){
+    const email=sg('sfi-email'), parts=email.split('@');
+    const emailJS=parts.length===2?`function(){return ['${parts[0]}','${parts[1]}'].join('@');}`:`function(){return '${email}';}`;
+    const cfg={societe:{nom:sg('sfi-nom')||'Société',slogan:sg('sfi-slogan')||'',telephone:sg('sfi-tel')||'',contact:sg('sfi-contact')||'',adresse:sg('sfi-adresse')||'',siret:sg('sfi-siret')||''},theme:{couleur_principale:sg('stx1')||'#22c55e',couleur_foncee:sg('stx2')||'#15803d',couleur_claire:'#4ade80',couleur_fond:sg('stx3')||'#f7fdf9',logo_url:sg('sfi-logo')||'',logo_emoji:sg('sfi-emoji')||'🏪',logo_texte:sg('sfi-nom')||'Société'},supabase:{url:setupSbU(),key:setupSbK()},conditions:{tva_taux:parseFloat(sg('sfi-tva'))||5.5,franco_port_ht:parseFloat(sg('sfi-fht'))||450,franco_port_colis:parseInt(sg('sfi-fcol'))||5,tarif_version:sg('sfi-ver')||'V1'},profils:setupProfils,crm:{mot_de_passe:sg('sfi-pwd')||'crm2026',prefix_client:sg('sfi-prefix')||'CLI'}};
+    const js=`/* Kit CRM White-Label — config.js\n   Généré le ${new Date().toLocaleDateString('fr-FR')} via LOAC DEV Dashboard\n   Ne pas partager publiquement */\n\nvar KIT_CONFIG = ${JSON.stringify(cfg,null,2)};\n\n/* Email construit en JS */\nKIT_CONFIG.societe.email_fn = ${emailJS};\n`;
+    document.getElementById('setup-cfg-out').textContent=js;
+    const ok=t=>'<span style="color:var(--teal2)">✅ '+t+'</span>', no=t=>'<span style="color:#c0392b">❌ '+t+'</span>';
+    document.getElementById('setup-deploy-st').innerHTML='<div style="display:flex;flex-wrap:wrap;gap:.4rem;font-size:.76rem">'+(sg('sfi-nom')?ok('Société'):no('Nom manquant'))+(email?ok('Email'):no('Email manquant'))+(setupSbU()&&setupSbK()?ok('Supabase'):no('Supabase non configuré'))+(setupCat.length?ok(setupCat.length+' produits'):no('Catalogue vide'))+(setupProfils.length?ok(setupProfils.length+' profils'):no('Pas de profil'))+(sg('sfi-pwd')?ok('Mot de passe'):no('Mot de passe manquant'))+'</div>';
+    return js;
+  }
+
+  function setupCopierConfig(){ const t=setupGenConfig(); navigator.clipboard.writeText(t).then(()=>alert('Config copiée !')); }
+  function setupTelechargerConfig(){
+    const txt=setupGenConfig();
+    const nom=(sg('sfi-nom')||'config').toLowerCase().replace(/[^a-z0-9]/g,'-');
+    const blob=new Blob([txt],{type:'text/javascript'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='config-'+nom+'.js'; a.click();
+  }
+
 </script>
 </body>
 </html>
